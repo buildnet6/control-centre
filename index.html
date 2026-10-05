@@ -1,0 +1,1257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2D4686">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Control Centre">
+<title>Prof Newrock Control Centre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a drawing-issue register. Sticky header + view rail, card grid of "sheets", detail drawer that slides in. */
+:root{
+  --bg:#F3F4F7; --surface:#FFFFFF; --sunk:#E9EBF1; --line:#D5D9E3; --fg:#1B2030; --muted:#5E6577;
+  --indigo:#2D4686; --indigo-soft:#E2E7F4; --laterite:#A9502A; --laterite-soft:#F6E6DD;
+  --good:#2F7A4F; --good-soft:#DFF0E5; --warn:#9A6A08; --warn-soft:#F7EDD2; --bad:#B03A3A; --bad-soft:#F6DEDE;
+  --f-display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11141B; --surface:#1A1E28; --sunk:#232836; --line:#313849; --fg:#E7E9F0; --muted:#9AA1B4;
+  --indigo:#8EA6E8; --indigo-soft:#253150; --laterite:#E08A62; --laterite-soft:#3B2820;
+  --good:#6CC892; --good-soft:#1F3428; --warn:#E3B349; --warn-soft:#3A3019; --bad:#EE8080; --bad-soft:#3E2224;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11141B; --surface:#1A1E28; --sunk:#232836; --line:#313849; --fg:#E7E9F0; --muted:#9AA1B4;
+  --indigo:#8EA6E8; --indigo-soft:#253150; --laterite:#E08A62; --laterite-soft:#3B2820;
+  --good:#6CC892; --good-soft:#1F3428; --warn:#E3B349; --warn-soft:#3A3019; --bad:#EE8080; --bad-soft:#3E2224;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:12px;padding-block:12px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;min-width:0;flex:1}
+.brand small{font:600 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.brand h1{font:700 22px/1.15 var(--f-display);margin:4px 0 0;text-wrap:balance}
+.tabs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:999px}
+.tabs button{border:0;background:transparent;padding:7px 12px;border-radius:999px;font-weight:600;font-size:14px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-block:16px}
+.stat{background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:2px;border:0;text-align:left}
+button.stat:hover{background:var(--sunk)}
+.stat b{font:700 26px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.stat.alert b{color:var(--bad)}
+.rail{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip i{font-style:normal;font:600 11px var(--f-mono);opacity:.7}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-block:6px 16px}
+.tools input,.tools select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-width:0}
+.tools input{flex:1 1 220px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;font-weight:600;font-size:14px}
+.btn.primary{background:var(--indigo);border-color:var(--indigo);color:var(--surface)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px;padding-bottom:96px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;text-align:left;min-width:0;width:100%}
+.card:hover{border-color:var(--muted)}
+.card .head{display:flex;gap:10px;align-items:flex-start}
+.pid{font:600 12px/1 var(--f-mono);color:var(--muted);padding-top:4px;flex:none}
+.card h3{font:600 17px/1.25 var(--f-display);margin:0;flex:1;min-width:0;text-wrap:balance}
+.pill{flex:none;font:600 11px/1 var(--f-mono);padding:5px 7px;border-radius:5px;letter-spacing:.04em}
+.pill.P1{background:var(--laterite);color:var(--surface)}
+.pill.P2{background:var(--indigo-soft);color:var(--indigo)}
+.pill.P3,.pill.P4{background:var(--sunk);color:var(--muted)}
+.pill.PX{background:var(--bad-soft);color:var(--bad)}
+.metrics{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.scale{display:flex;align-items:center;gap:6px}
+.segs{display:grid;grid-template-columns:repeat(8,10px);gap:2px}
+.segs s{height:10px;border-radius:2px;background:var(--sunk);text-decoration:none}
+.segs s.on{background:var(--indigo)}
+.segs s.part{background:repeating-linear-gradient(135deg,var(--indigo) 0 2px,transparent 2px 4px);outline:1px solid var(--indigo);outline-offset:-1px}
+.scale em{font:600 12px var(--f-mono);font-style:normal;color:var(--muted)}
+.coins{display:flex;gap:3px;align-items:center}
+.coins s{width:9px;height:9px;border-radius:50%;background:var(--sunk);text-decoration:none}
+.coins s.on{background:var(--laterite)}
+.coins b{font:600 11px var(--f-mono);color:var(--laterite)}
+.what{margin:-4px 0 0;font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.traj{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.traj div{background:var(--bg);padding:10px 12px;font-size:14px}
+.traj b{display:block;font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--indigo);margin-bottom:3px}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.chain .arrow{color:var(--muted);font-family:var(--f-mono)}
+.conn{padding:12px 0;border-bottom:1px solid var(--line)}
+.conn:last-child{border-bottom:0}
+.conn p{margin:0;font-size:14px;color:var(--muted);max-width:70ch}
+@media (max-width:560px){.traj{grid-template-columns:1fr}}
+.next{font-size:14px;color:var(--fg);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0}
+.next::before{content:"Next ";font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.tag.good{background:var(--good-soft);color:var(--good)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.bad{background:var(--bad-soft);color:var(--bad)}
+.tag.week{background:var(--indigo-soft);color:var(--indigo);font-weight:600}
+.score{margin-left:auto;font:600 12px var(--f-mono);color:var(--muted)}
+.empty{grid-column:1/-1;border:1px dashed var(--line);border-radius:var(--r);padding:32px;text-align:center;color:var(--muted)}
+.empty h2{font:600 20px var(--f-display);color:var(--fg);margin:0 0 6px}
+.note{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:10px 14px;font-size:14px;margin-bottom:12px}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,12,18,.45);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(100%,600px);background:var(--surface);z-index:41;display:flex;flex-direction:column;border-left:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.dhead{display:flex;gap:10px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dhead h2{font:700 19px/1.2 var(--f-display);margin:0;flex:1;min-width:0}
+.dbody{overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:18px;flex:1}
+.dfoot{display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);flex-wrap:wrap}
+.dfoot .grow{flex:1}
+.quick{display:flex;gap:8px;flex-wrap:wrap}
+.fs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fs .full{grid-column:1/-1}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f label{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.f input,.f select,.f textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+.f textarea{resize:vertical;min-height:64px;line-height:1.45}
+.sect{font:600 13px var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:6px;margin:0}
+.breakdown{display:grid;grid-template-columns:1fr auto;gap:4px 16px;font-size:13px;background:var(--bg);border-radius:8px;padding:12px;font-variant-numeric:tabular-nums}
+.breakdown b{font-family:var(--f-mono)}
+.breakdown .tot{border-top:1px solid var(--line);padding-top:6px;font-weight:600}
+/* week + review */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.panel h2{font:700 20px var(--f-display);margin:0 0 4px}
+.panel p.sub{color:var(--muted);margin:0 0 14px;font-size:14px;max-width:65ch}
+.five{display:flex;flex-direction:column;gap:8px;counter-reset:o}
+.out{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.out .n{font:700 20px var(--f-display);color:var(--indigo);width:22px}
+.out input{border:0;background:transparent;width:100%;padding:4px 0;border-bottom:1px dashed var(--line);border-radius:0}
+.out small{display:block;color:var(--muted);font-size:12px}
+.layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.layer{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px}
+.layer b{display:block;font:600 14px var(--f-display)}
+.layer.over{border-color:var(--bad);background:var(--bad-soft)}
+.qs{display:flex;flex-direction:column;gap:14px}
+.weekpick{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.ref{width:100%;border-collapse:collapse;font-size:14px}
+.ref td,.ref th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+.ref th{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ref td:first-child{font-family:var(--f-mono);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.qa{display:flex;flex-direction:column;gap:18px}
+.qblock h3{font:600 15px/1.35 var(--f-display);margin:0 0 6px}
+.qblock ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.qblock li{padding:7px 10px 7px 12px;border-left:3px solid var(--line);background:var(--bg);border-radius:0 6px 6px 0;font-size:14px}
+.qblock li.good{border-left-color:var(--good)}
+.qblock li.warn{border-left-color:var(--warn)}
+.qblock li.bad{border-left-color:var(--bad)}
+button.link{border:0;background:none;padding:0;text-align:left;color:inherit;font:inherit;width:100%}
+button.link:hover{color:var(--indigo)}
+.day{margin-bottom:12px}
+.day h4{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.logrow{display:grid;grid-template-columns:auto auto 1fr;gap:10px;align-items:baseline;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:8px 2px;font-size:14px}
+.logrow:hover{background:var(--bg)}
+.lt{font:500 12px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.lk{font:600 11px var(--f-mono);padding:3px 6px;border-radius:4px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.k-maturity_up,.k-outcome_done,.k-milestone,.k-created{background:var(--good-soft);color:var(--good)}
+.k-revenue{background:var(--laterite-soft);color:var(--laterite)}
+.k-maturity_down,.k-archived{background:var(--bad-soft);color:var(--bad)}
+.k-week_in,.k-outcome_set{background:var(--indigo-soft);color:var(--indigo)}
+.ln{min-width:0;overflow-wrap:anywhere}
+.tick{display:flex;align-items:center;gap:6px;cursor:pointer}
+.tick input{width:20px;height:20px;accent-color:var(--good)}
+.out.done .n{color:var(--good)}
+.out.done input[data-wo]{text-decoration:line-through;color:var(--muted)}
+@media (max-width:560px){.logrow{grid-template-columns:auto 1fr}.logrow .lt{grid-row:span 2}}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:13px 18px;background:var(--laterite);color:var(--surface);font:600 15px var(--f-display);box-shadow:0 6px 18px rgba(0,0,0,.22)}
+.fab svg,.btn svg{width:18px;height:18px;flex:none}
+.btn.withicon{display:inline-flex;align-items:center;gap:6px}
+.upd .hint{display:flex;gap:10px;align-items:flex-start;background:var(--indigo-soft);color:var(--indigo);border-radius:8px;padding:10px 12px;font-size:14px}
+.upd textarea#updText{min-height:180px;font-size:16px}
+.shots{display:flex;gap:8px;flex-wrap:wrap}
+.shot{position:relative;width:76px;height:76px;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--sunk)}
+.shot img{width:100%;height:100%;object-fit:cover}
+.shot button{position:absolute;top:2px;right:2px;border:0;border-radius:50%;width:22px;height:22px;background:rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:1}
+.filebtn{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--muted);border-radius:8px;padding:9px 14px;font-weight:600;font-size:14px;cursor:pointer}
+.filebtn input{position:absolute;width:1px;height:1px;opacity:0}
+.thinking{display:flex;gap:10px;align-items:center;padding:16px;background:var(--bg);border-radius:8px;color:var(--muted)}
+.dots{display:inline-flex;gap:4px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--indigo);opacity:.3}
+@media (prefers-reduced-motion:no-preference){.dots i{animation:pulse 1.2s infinite}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}@keyframes pulse{50%{opacity:1}}}
+.prop{border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.prop .phead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.prop .phead select{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px}
+.chg{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:start;padding-top:8px;border-top:1px solid var(--line)}
+.chg input[type=checkbox]{width:18px;height:18px;margin-top:3px;accent-color:var(--good)}
+.chg .cl{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chg .was{font-size:13px;color:var(--muted);text-decoration:line-through;overflow-wrap:anywhere}
+.chg .why{font-size:12px;color:var(--good)}
+.chg .cv{display:flex;flex-direction:column;gap:4px;min-width:0}
+.chg .cv input,.chg .cv select,.chg .cv textarea{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 8px;width:100%}
+.chg.off .cv{opacity:.45}
+.hist{display:flex;flex-direction:column;gap:10px}
+.hent{border-left:3px solid var(--indigo);padding:4px 0 4px 10px;font-size:14px}
+.hent small{display:block;font:500 11px var(--f-mono);color:var(--muted);margin-bottom:2px}
+.hent .shots{margin-top:6px}.hent .shot{width:60px;height:60px}
+.k-update{background:var(--indigo-soft);color:var(--indigo)}
+.msline{margin:-4px 0 0;font-size:13px;display:flex;gap:8px;align-items:baseline;color:var(--fg)}
+.msline span{flex:none;font:600 11px var(--f-mono);padding:2px 6px;border-radius:4px;background:var(--sunk);color:var(--muted)}
+.msline.warn span{background:var(--warn-soft);color:var(--warn)}
+.msline.bad span{background:var(--bad-soft);color:var(--bad)}
+.why-line{margin:0;font-size:14px;background:var(--indigo-soft);color:var(--fg);border-radius:8px;padding:10px 12px}
+.msed{display:flex;flex-direction:column;gap:6px}
+.msrow{display:grid;grid-template-columns:auto 1fr 150px auto;gap:8px;align-items:center}
+.msrow input[type=checkbox]{width:18px;height:18px;accent-color:var(--good)}
+.msrow input[data-mt],.msrow input[data-mu]{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;min-width:0;width:100%}
+.msrow.done input[data-mt]{text-decoration:line-through;color:var(--muted)}
+.msx{border:0;background:none;color:var(--muted);font-size:18px;padding:4px 6px}
+@media (max-width:560px){.msrow{grid-template-columns:auto 1fr auto}.msrow input[data-mu]{grid-column:2/3}}
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-block:16px 14px}
+.hero small{font:600 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.hero h2{font:700 24px/1.2 var(--f-display);margin:6px 0 8px;text-wrap:balance}
+.hero p{margin:0;max-width:68ch;font-size:15px}
+.pulse{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:14px}
+.pulse button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:10px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.pulse b{font:700 22px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.pulse span{font-size:12px;color:var(--muted)}
+.pulse .bad b{color:var(--bad)}.pulse .warn b{color:var(--warn)}.pulse .good b{color:var(--good)}
+.nlist{display:flex;flex-direction:column;gap:6px}
+.nitem{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-left-width:4px;border-radius:8px;background:var(--bg)}
+.nitem.bad{border-left-color:var(--bad)}.nitem.warn{border-left-color:var(--warn)}.nitem.good{border-left-color:var(--good)}.nitem.info{border-left-color:var(--indigo)}
+.nitem button.link b{display:block;font-weight:600}
+.nitem button.link small{display:block;color:var(--muted);font-size:13px}
+.nitem .btn{padding:6px 10px;font-size:13px}
+.month{margin-bottom:18px}
+.month h3{font:700 17px var(--f-display);margin:0 0 8px;display:flex;gap:8px;align-items:baseline}
+.month h3 span{font:500 12px var(--f-mono);color:var(--muted)}
+.rmrow{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:start;padding:8px 0;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;background:none;font-size:14px}
+.rmrow .d{font:600 12px var(--f-mono);color:var(--muted)}
+.rmrow.done{opacity:.55}.rmrow.done .t{text-decoration:line-through}
+.rmrow.late .d{color:var(--bad)}
+.rmrow .who{display:block;font-size:12px;color:var(--muted)}
+.rmfilters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+
+.cl2{display:block;font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:4px 0 6px}
+.tag.dom-learn,.verb.dom-learn,.spoke.dom-learn{--dc:var(--indigo);--ds:var(--indigo-soft)}
+.tag.dom-work,.verb.dom-work,.spoke.dom-work{--dc:var(--fg);--ds:var(--sunk)}
+.tag.dom-heal,.verb.dom-heal,.spoke.dom-heal{--dc:var(--good);--ds:var(--good-soft)}
+.tag.dom-remember,.verb.dom-remember,.spoke.dom-remember{--dc:var(--laterite);--ds:var(--laterite-soft)}
+.tag.dom-imagine,.verb.dom-imagine,.spoke.dom-imagine{--dc:var(--warn);--ds:var(--warn-soft)}
+.tag.dom-spine,.verb.dom-spine,.spoke.dom-spine{--dc:var(--muted);--ds:var(--bg)}
+.tag[class*="dom-"]{background:var(--ds);color:var(--dc);font-weight:600}
+.combo .eyebrow{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--laterite)}
+.combo h2{font-size:26px;margin-top:6px}
+.combo .lede{font:600 18px/1.4 var(--f-display);margin:0 0 10px;max-width:40ch;text-wrap:balance}
+.verbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:14px 0}
+.verb{border:1px solid var(--line);border-top:4px solid var(--dc);background:var(--ds);border-radius:8px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.verb b{font:700 18px var(--f-display);color:var(--dc)}
+.verb span{font:600 11px var(--f-mono);color:var(--muted)}
+.verb small{font-size:12px;color:var(--fg)}
+.h3{font:700 16px var(--f-display);margin:18px 0 8px}
+.method{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;max-width:70ch;font-size:14px}
+.wheel{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spoke{border-left:4px solid var(--dc);background:var(--ds);border-radius:6px;padding:8px 10px;font-size:13px;flex:1 1 160px}
+.spoke b{display:block;font:600 14px var(--f-display);color:var(--dc)}
+.wheel>span{color:var(--muted);font-family:var(--f-mono)}
+.wheel .loop{flex-basis:100%;font-size:13px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:60}
+.rules li{margin-bottom:6px;max-width:70ch}
+@media (max-width:560px){.brand h1{font-size:19px}.tabs{width:100%}.tabs button{flex:1;padding:7px 2px;font-size:13px}.fs{grid-template-columns:1fr}.stat b{font-size:22px}}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}}}
+</style>
+
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+#ccGate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px}
+#ccGate .gbox{width:min(100%,400px);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px}
+#ccGate small{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#ccGate h1{font:700 26px var(--f-display);margin:6px 0 4px}
+#ccGate p{color:var(--muted);margin:0 0 14px}
+#ccGate form{display:flex;flex-direction:column;gap:8px}
+#ccGate label{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#ccGate input{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 12px;font-size:16px}
+#ccGate .btn{padding:11px}
+#ccGate .link{border:0;background:none;color:var(--indigo);font-size:14px;padding:4px;cursor:pointer}
+#ccGate .gmsg{min-height:1.4em;font-size:14px;color:var(--fg);margin:4px 0 0}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <div class="brand"><small>BuildNET · Portfolio register</small><h1>Master Project &amp; Product Control Centre</h1></div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="focus" aria-selected="true">Focus</button>
+      <button role="tab" data-tab="register" aria-selected="false">Register</button>
+      <button role="tab" data-tab="roadmap" aria-selected="false">Roadmap</button>
+      <button role="tab" data-tab="review" aria-selected="false">Review</button>
+      <button role="tab" data-tab="rules" aria-selected="false">Map</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="status" class="note" hidden></div>
+  <section id="tab-focus"></section>
+  <section id="tab-register" hidden>
+    <div class="stats" id="stats"></div>
+    <div class="rail" id="rail" role="toolbar" aria-label="Dashboard views"></div>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Search name, purpose, next action…" aria-label="Search">
+      <select id="sort" aria-label="Sort">
+        <option value="score">Sort: decision score</option>
+        <option value="id">Sort: ID</option>
+        <option value="maturity">Sort: maturity</option>
+        <option value="money">Sort: money</option>
+        <option value="stale">Sort: longest untouched</option>
+        <option value="deadline">Sort: deadline</option>
+        <option value="milestone">Sort: next milestone</option>
+      </select>
+      <button class="btn" id="exportBtn" hidden>Export CSV</button>
+      <button class="btn primary" id="addBtn">New project</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="tab-roadmap" hidden></section>
+  <section id="tab-review" hidden></section>
+  <section id="tab-rules" hidden></section>
+</main>
+
+<div id="drawerRoot" hidden>
+  <div class="scrim" id="scrim"></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <div class="dhead"><span class="pid" id="dId"></span><h2 id="dTitle"></h2><button class="btn" id="dClose" aria-label="Close">Close</button></div>
+    <div class="dbody" id="dBody"></div>
+    <div class="dfoot"><button class="btn" id="dDelete">Archive (PX)</button><span class="grow"></span><button class="btn" id="dCancel">Cancel</button><button class="btn primary" id="dSave">Save</button></div>
+  </aside>
+</div>
+<button class="fab" id="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Update a project</button>
+<div id="updRoot" hidden>
+  <div class="scrim" id="updScrim"></div>
+  <aside class="drawer upd" role="dialog" aria-modal="true" aria-labelledby="uTitle">
+    <div class="dhead"><h2 id="uTitle">Project update</h2><button class="btn" id="uClose">Close</button></div>
+    <div class="dbody" id="uBody"></div>
+    <div class="dfoot" id="uFoot"></div>
+  </aside>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="cc-runtime.js"></script>
+<script>
+(function(){
+const ENGINES={professional:"Professional Technology",education:"Education",heritage:"Digital Heritage & Virtual Worlds",creative:"Media, Creative & Entertainment IP",intelligence:"Intelligence & Research",programmes:"Community, Distribution & Events"};
+const DOMAINS={learn:["Learn","Education, community and events that grow people"],work:["Work","Tools and services for built-environment professionals"],heal:["Heal","Health products for professionals and patients"],remember:["Remember","Heritage worlds that keep African history visitable"],imagine:["Imagine","Stories, media and visual IP"],spine:["Spine","The method, the voice, the distribution and the execution system under everything"],unplaced:["Unplaced","No honest connection yet"]};
+const DECISIONS=["Build","Finish","Maintain","Delegate","Park","Kill"];
+const PRIORITIES=["P1","P2","P3","P4","PX"];
+const REVENUE=["none","experimental","active","recurring"];
+const MATS=["M0","M1","M2","M3","M4","M5","M6","M7","M1/M2","M2/M3","M3/M4","M4/M5","M4/M6","M5/M6","M4/M7"];
+const MAT_NAMES=["Thought","Concept","Specification","Prototype","Working Product","Live Product","Monetized Product","Operating Business"];
+const QUESTIONS=["What made money this week?","What product moved materially closer to completion?","Which project has been forgotten for too long?","What external deadline is approaching?","What project can be finished with less than a week of concentrated work?","Which project is consuming attention without evidence of value?","What can be delegated to AI or another person?","What should be deliberately parked?"];
+
+let db=null, canWrite=true, downloads=null;
+let projects={}, settings={forgottenDays:30,nextId:51}, loaded=false;
+let view="all", tab="focus", editing=null, reviewWeek=weekId(new Date()), reviewDoc={}, reviewUnsub=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const todayISO=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+function weekId(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return t.getUTCFullYear()+"-W"+String(Math.ceil(((t-y)/864e5+1)/7)).padStart(2,"0")}
+function matRange(m){const n=(String(m).match(/\d/g)||["0"]).map(Number);return [n[0],n[n.length-1]]}
+function daysSince(iso){if(!iso)return Infinity;return Math.floor((Date.now()-new Date(iso+"T12:00:00").getTime())/864e5)}
+function daysUntil(iso){if(!iso)return null;return Math.ceil((new Date(iso+"T12:00:00").getTime()-Date.now())/864e5)}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2200)}
+
+/* milestones */
+function ms(p){return Array.isArray(p.milestones)?p.milestones:[]}
+function nextMs(p){return ms(p).filter(m=>!m.done&&m.due).sort((a,b)=>a.due.localeCompare(b.due))[0]||null}
+function overdueMs(p){return ms(p).filter(m=>!m.done&&m.due&&daysUntil(m.due)<0)}
+function fmtDate(iso){if(!iso)return "";const d=new Date(iso+"T12:00:00");return d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:d.getFullYear()!==new Date().getFullYear()?"numeric":undefined})}
+function dueText(iso){const d=daysUntil(iso);return d<0?`${Math.abs(d)}d overdue`:d===0?"due today":d===1?"due tomorrow":d<=60?`due in ${d}d`:`due ${fmtDate(iso)}`}
+function active(p){return p.priority!=="PX"&&!["Park","Kill"].includes(p.decision)}
+function incoming(id){const out=[];list().forEach(h=>(h.helps||[]).forEach(x=>{if(x.to===id&&h.priority!=="PX")out.push({from:h,what:x.what})}));return out}
+function addDays(iso,n){const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+n);return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+function helpTitle(target,what){return `Help ${target.name}: ${what}`}
+function helpScheduled(helper,target,what){return ms(helper).some(m=>m.t===helpTitle(target,what))}
+function score(p){
+  const [lo,hi]=matRange(p.maturity);const parts=[];
+  parts.push(["Revenue potential",(p.money||1)*3]);
+  parts.push(["Existing momentum (maturity)",Math.round((lo+hi))]);
+  parts.push(["Priority",{P1:15,P2:8,P3:3,P4:0,PX:-25}[p.priority]??0]);
+  parts.push(["Live revenue",{recurring:12,active:10,experimental:5,none:0}[p.revenue]||0]);
+  parts.push(["Strategic value",(p.strategic||2)*4]);
+  const du=daysUntil(p.deadline);
+  parts.push(["External deadline",du==null?0:du<0?6:du<=30?14:du<=90?9:du<=180?4:1]);
+  const nm=nextMs(p),md=nm?daysUntil(nm.due):null;
+  parts.push(["Next milestone timing",md==null?0:md<0?8:md<=14?7:md<=45?4:md<=120?1:0]);
+  parts.push(["Ecosystem leverage",Math.min(8,(p.helps||[]).length*2)]);
+  parts.push(["Execution cost",-(p.effort||2)*3]);
+  return {total:parts.reduce((a,b)=>a+b[1],0),parts};
+}
+const LINKS={P39:3,P41:2,P42:3,P11:2,P35:2,P07:2,P12:2,P05:2,P06:1,P31:2,P32:2,P43:2,P02:1,P22:3,P01:1,P36:1,P37:1,P09:1,P10:1,P40:1,P30:1,P15:1,P16:1,P17:1,P18:1,P13:1,P14:1};
+
+function isForgotten(p){return p.priority!=="PX" && p.decision!=="Kill" && daysSince(p.lastActivity)>settings.forgottenDays}
+const VIEWS=[
+  ["all","Everything",p=>p.priority!=="PX"],
+  ["money","Money now",p=>p.revenue==="active"||p.revenue==="recurring"||matRange(p.maturity)[1]>=6],
+  ["build","Build now",p=>p.week||(p.decision==="Build"&&p.priority==="P1")],
+  ["finish","Finish me",p=>{const [lo,hi]=matRange(p.maturity);return p.decision==="Finish"||(lo>=3&&hi<=5&&["P1","P2"].includes(p.priority)&&!["Park","Kill","Maintain"].includes(p.decision))}],
+  ["forgotten","Forgotten",isForgotten],
+  ["overdue","Overdue milestones",p=>active(p)&&overdueMs(p).length>0],
+  ["soon","Due in 30 days",p=>{const m=nextMs(p);return active(p)&&!!m&&daysUntil(m.due)<=30}],
+  ["deadlines","Deadlines",p=>!!p.deadline],
+  ["creative","Creative",p=>p.engine==="creative"],
+  ["heritage","Heritage worlds",p=>p.engine==="heritage"],
+  ["education","Education",p=>p.engine==="education"],
+  ["research","Research",p=>!!p.research||/research|academic|phd/i.test(p.category||"")],
+  ["d_learn","Learn",p=>p.domain==="learn"],["d_work","Work",p=>p.domain==="work"],["d_heal","Heal",p=>p.domain==="heal"],["d_remember","Remember",p=>p.domain==="remember"],["d_imagine","Imagine",p=>p.domain==="imagine"],["d_spine","Spine",p=>p.domain==="spine"],
+  ["professional","Pro products",p=>p.engine==="professional"],
+  ["intelligence","Intelligence",p=>p.engine==="intelligence"],
+  ["programmes","Community & events",p=>p.engine==="programmes"],
+  ["highmoney","High money potential",p=>(p.money||0)>=5],
+  ["parked","Parked",p=>p.priority==="P4"||p.decision==="Park"],
+  ["resurrect","Resurrection queue",p=>isForgotten(p)&&(["P3","P4"].includes(p.priority)||p.decision==="Park")],
+  ["archived","Archived",p=>p.priority==="PX"||p.decision==="Kill"],
+];
+
+function list(){return Object.values(projects)}
+function renderStats(){
+  const L=list().filter(p=>p.priority!=="PX");
+  const money=L.filter(VIEWS[1][2]).length, p1=L.filter(p=>p.priority==="P1").length;
+  const wk=L.filter(p=>p.week).length, forg=L.filter(isForgotten).length;
+  const dl=L.filter(p=>p.deadline).sort((a,b)=>a.deadline.localeCompare(b.deadline))[0];
+  const du=dl?daysUntil(dl.deadline):null;
+  $("#stats").innerHTML=`
+    <button class="stat" data-go="all"><b>${L.length}</b><span>Projects tracked</span></button>
+    <button class="stat" data-go="money"><b>${money}</b><span>Earning or live</span></button>
+    <button class="stat${p1>12?" alert":""}" data-go="build"><b>${p1}</b><span>Marked P1</span></button>
+    <button class="stat${wk>5?" alert":""}" data-tabgo="focus"><b>${wk}/5</b><span>This week's outcomes</span></button>
+    <button class="stat${forg?" alert":""}" data-go="forgotten"><b>${forg}</b><span>Untouched ${settings.forgottenDays}+ days</span></button>
+    <button class="stat" data-go="deadlines"><b>${du==null?"–":du+"d"}</b><span>${dl?esc(dl.name):"No deadlines set"}</span></button>`;
+}
+function renderRail(){
+  $("#rail").innerHTML=VIEWS.map(([k,l,f])=>`<button class="chip" aria-pressed="${k===view}" data-view="${k}">${esc(l)} <i>${list().filter(f).length}</i></button>`).join("");
+}
+function segs(m){const [lo,hi]=matRange(m);let h="";for(let i=0;i<8;i++)h+=`<s class="${i<=lo?"on":i<=hi?"part":""}"></s>`;return h}
+function coins(n){let h="";const v=Math.min(5,n||0);for(let i=1;i<=5;i++)h+=`<s class="${i<=v?"on":""}"></s>`;return h+(n>=6?"<b>+</b>":"")}
+function cardTags(p){
+  const t=[`<span class="tag">${esc(p.decision)}</span>`];
+  if(p.domain&&DOMAINS[p.domain])t.push(`<span class="tag dom-${esc(p.domain)}">${esc(DOMAINS[p.domain][0])}</span>`);
+  if(p.week)t.unshift(`<span class="tag week">This week</span>`);
+  if(p.revenue==="recurring"||p.revenue==="active")t.push(`<span class="tag good">Revenue ${esc(p.revenue)}</span>`);
+  else if(p.revenue==="experimental")t.push(`<span class="tag warn">Revenue experimental</span>`);
+  const du=daysUntil(p.deadline);
+  if(du!=null)t.push(`<span class="tag ${du<0?"bad":du<=45?"warn":""}">${du<0?Math.abs(du)+"d overdue":"Due in "+du+"d"}</span>`);
+  const ds=daysSince(p.lastActivity);
+  t.push(ds===Infinity?`<span class="tag${p.priority!=="PX"?" warn":""}">No activity logged</span>`:`<span class="tag${ds>settings.forgottenDays?" bad":""}">Touched ${ds===0?"today":ds+"d ago"}</span>`);
+  return t.join("");
+}
+function sorted(arr){
+  const s=$("#sort").value;
+  const by={score:(a,b)=>score(b).total-score(a).total,id:(a,b)=>a.id.localeCompare(b.id),maturity:(a,b)=>matRange(b.maturity)[1]-matRange(a.maturity)[1]||score(b).total-score(a).total,money:(a,b)=>(b.money||0)-(a.money||0)||score(b).total-score(a).total,stale:(a,b)=>{const x=daysSince(b.lastActivity),y=daysSince(a.lastActivity);return x===y?a.id.localeCompare(b.id):(x===Infinity?1:y===Infinity?-1:x-y)},deadline:(a,b)=>(a.deadline||"9999").localeCompare(b.deadline||"9999"),milestone:(a,b)=>((nextMs(a)||{}).due||"9999").localeCompare((nextMs(b)||{}).due||"9999")};
+  return arr.sort(by[s]||by.score);
+}
+function renderGrid(){
+  const g=$("#grid");
+  if(!loaded){g.innerHTML=`<div class="empty"><h2>Loading the register</h2>Connecting to your saved projects.</div>`;return}
+  if(!list().length){g.innerHTML=`<div class="empty"><h2>The register is empty</h2>${db?"Add the first project with New project.":"Sign in to load and save your projects."}</div>`;return}
+  const f=VIEWS.find(v=>v[0]===view)[2];const q=$("#q").value.trim().toLowerCase();
+  let L=list().filter(f);
+  if(q)L=L.filter(p=>[p.id,p.name,p.category,p.purpose,p.next,p.notes,p.state,p.whatItIs,p.supposedTo,p.longTerm].join(" ").toLowerCase().includes(q));
+  sorted(L);
+  if(!L.length){g.innerHTML=`<div class="empty"><h2>Nothing in this view</h2>${view==="deadlines"?"Add a deadline to a project and it appears here.":view==="forgotten"?"Every project has been touched recently.":"Try another view or clear the search."}</div>`;return}
+  g.innerHTML=L.map(p=>`<button class="card" data-open="${esc(p.id)}">
+    <div class="head"><span class="pid">${esc(p.id)}</span><h3>${esc(p.name)}</h3><span class="pill ${esc(p.priority)}">${esc(p.priority)}</span></div>
+    ${p.whatItIs?`<p class="what">${esc(p.whatItIs)}</p>`:""}
+    <div class="metrics"><span class="scale" title="Maturity ${esc(p.maturity)}"><span class="segs">${segs(p.maturity)}</span><em>${esc(p.maturity)}</em></span><span class="coins" title="Money score">${coins(p.money)}</span></div>
+    <p class="next">${esc(p.next||"No next action set")}</p>
+    ${(()=>{const m=nextMs(p);if(!m)return "";const d=daysUntil(m.due);return `<p class="msline ${d<0?"bad":d<=14?"warn":""}"><span>${esc(dueText(m.due))}</span>${esc(m.t)}</p>`})()}
+    <div class="tags">${cardTags(p)}<span class="score" title="Decision score">${score(p).total}</span></div>
+  </button>`).join("");
+}
+function render(){renderStats();renderRail();renderGrid();if(tab==="focus"&&!(document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.wo))renderFocus();if(tab==="roadmap")renderRoadmap();if(tab==="review"&&document.activeElement?.id!=="rvNotes")renderReview();}
+
+/* drawer */
+function field(id,label,val,type="text",opts,cls=""){
+  const v=val??"";
+  let ctl;
+  if(type==="select")ctl=`<select id="${id}">${opts.map(o=>{const [k,l]=Array.isArray(o)?o:[o,o];return `<option value="${esc(k)}"${String(k)===String(v)?" selected":""}>${esc(l)}</option>`}).join("")}</select>`;
+  else if(type==="textarea")ctl=`<textarea id="${id}" rows="3">${esc(v)}</textarea>`;
+  else ctl=`<input id="${id}" type="${type}" value="${esc(v)}">`;
+  return `<div class="f ${cls}"><label for="${id}">${esc(label)}</label>${ctl}</div>`;
+}
+function openDrawer(id,isNew,prefill){
+  const p=isNew?{...{id,name:"",engine:"professional",category:"",maturity:"M1",money:3,priority:"P3",decision:"Build",revenue:"none",strategic:2,effort:2,state:"",purpose:"",whatItIs:"",supposedTo:"",nearFuture:"",longTerm:"",character:"",exists:"",remains:"",next:"",routes:"",deadline:"",deadlineNote:"",lastActivity:todayISO(),milestone:"",notes:"",week:false,weekOutcome:"",research:false},...(prefill||{})}:{...projects[id]};
+  editing={id,isNew};
+  $("#dId").textContent=p.id;$("#dTitle").textContent=isNew?"New project":p.name;
+  const sc=score(p);
+  $("#dBody").innerHTML=`
+    ${isNew?"":`<div class="quick"><button class="btn withicon" id="qUpd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Update by voice or text</button><button class="btn" id="qLog">Log activity today</button><button class="btn" id="qWeek">${p.week?"Remove from this week":"Add to this week's five"}</button></div>`}
+    <h3 class="sect">What it is</h3>
+    <div class="fs">
+      ${field("f_name","Canonical name",p.name,"text",null,"full")}
+      ${field("f_engine","Portfolio engine",p.engine,"select",Object.entries(ENGINES))}
+      ${field("f_category","Category",p.category)}
+      ${field("f_purpose","One-sentence purpose",p.purpose,"textarea",null,"full")}
+    </div>
+    <h3 class="sect">Purpose and trajectory</h3>
+    ${!isNew&&(p.nearFuture||p.longTerm)?`<div class="traj"><div><b>Near future · 3-12 months</b>${esc(p.nearFuture||"Not set")}</div><div><b>Long term · 2-5+ years</b>${esc(p.longTerm||"Not set")}</div></div>`:""}
+    <div class="fs">
+      ${field("f_whatItIs","What it is",p.whatItIs,"text",null,"full")}
+      ${field("f_supposedTo","What it is supposed to do",p.supposedTo,"textarea",null,"full")}
+      ${field("f_nearFuture","Near future (3-12 months)",p.nearFuture,"textarea")}
+      ${field("f_longTerm","Long term (2-5+ years)",p.longTerm,"textarea")}
+      ${field("f_character","Current character",p.character,"text",null,"full")}
+    </div>
+    ${isNew?"":comboHTML(p)}
+    <h3 class="sect">How far it has gone</h3>
+    <div class="fs">
+      ${field("f_maturity","Maturity",p.maturity,"select",MATS.map(m=>[m,m+" · "+(MAT_NAMES[matRange(m)[1]])]))}
+      ${field("f_state","Current state",p.state)}
+      ${field("f_exists","What exists",p.exists,"textarea",null,"full")}
+      ${field("f_remains","What remains",p.remains,"textarea",null,"full")}
+    </div>
+    <h3 class="sect">The money question</h3>
+    <div class="fs">
+      ${field("f_money","Money score",p.money,"select",[[1,"💰 indirect / reputation"],[2,"💰💰 modest"],[3,"💰💰💰 clear routes"],[4,"💰💰💰💰 strong"],[5,"💰💰💰💰💰 very high"],[6,"💰💰💰💰💰+ platform / IP"]])}
+      ${field("f_revenue","Current revenue",p.revenue,"select",REVENUE)}
+      ${field("f_routes","Monetization routes",p.routes,"textarea",null,"full")}
+    </div>
+    <h3 class="sect">Timeline</h3>
+    ${p.priorityWhy?`<p class="why-line"><b>${esc(p.priority)} · ${esc(p.decision)}.</b> ${esc(p.priorityWhy)}</p>`:""}
+    <div class="msed" id="msEd">${msEditor(ms(p))}</div>
+    <button class="btn" id="msAdd" type="button">Add milestone</button>
+    <h3 class="sect">Next move</h3>
+    <div class="fs">
+      ${field("f_priority","Priority",p.priority,"select",[["P1","P1 · Protect / build / finish now"],["P2","P2 · Planned growth blocks"],["P3","P3 · Strategic, protected"],["P4","P4 · Parked"],["PX","PX · Archive"]])}
+      ${field("f_decision","Decision",p.decision,"select",DECISIONS)}
+      ${field("f_milestone","Current milestone",p.milestone,"text",null,"full")}
+      ${field("f_next","One concrete next action",p.next,"textarea",null,"full")}
+      ${field("f_deadline","External deadline",p.deadline,"date")}
+      ${field("f_deadlineNote","Deadline note",p.deadlineNote)}
+      ${field("f_lastActivity","Last meaningful activity",p.lastActivity,"date")}
+      ${field("f_strategic","Strategic value",p.strategic,"select",[[1,"Low"],[2,"Medium"],[3,"High"]])}
+      ${field("f_effort","Execution cost",p.effort,"select",[[1,"Low"],[2,"Medium"],[3,"High"]])}
+      ${field("f_weekOutcome","This week's outcome (if in the five)",p.weekOutcome)}
+      ${field("f_notes","Notes, files, locked decisions",p.notes,"textarea",null,"full")}
+    </div>
+    ${!isNew&&(p.log||[]).length?`<h3 class="sect">Update history</h3><div class="hist">${p.log.map(h=>`<div class="hent"><small>${esc(h.d)} · ${esc(h.source==="voice"?"dictated":h.source||"update")}</small>${esc(h.summary)}${(h.shots||[]).length?`<div class="shots">${h.shots.map(id=>`<span class="shot"><img data-shot="${esc(id)}" alt="Screenshot from this update" loading="lazy"></span>`).join("")}</div>`:""}</div>`).join("")}</div>`:""}
+    <h3 class="sect">Decision score</h3>
+    <div class="breakdown">${sc.parts.map(([k,v])=>`<span>${esc(k)}</span><b>${v>0?"+":""}${v}</b>`).join("")}<span class="tot">Total</span><b class="tot">${sc.total}</b></div>
+    <p style="font-size:13px;color:var(--muted);margin:0">A guide for ranking. It weighs validated revenue and deadlines above novelty, as the register intends.</p>`;
+  $("#dDelete").hidden=isNew;
+  $("#drawerRoot").hidden=false;document.body.style.overflow="hidden";
+  $("#f_name").focus({preventScroll:true});
+  $("#msAdd").onclick=()=>{const cur=readMs();cur.push({t:"",due:"",done:false});$("#msEd").innerHTML=msEditor(cur);const ins=$("#msEd").querySelectorAll("input[data-mt]");ins[ins.length-1].focus()};
+  const qu=$("#qUpd");if(qu)qu.onclick=()=>{const id=editing.id;closeDrawer();openUpdate(id)};
+  const lg=$("#qLog");if(lg)lg.onclick=()=>{$("#f_lastActivity").value=todayISO();save()};
+  const qw=$("#qWeek");if(qw)qw.onclick=()=>{editing.toggleWeek=true;save()};
+}
+function comboHTML(p){
+  const inc=incoming(p.id),gives=(p.helps||[]).filter(x=>projects[x.to]);
+  const d=DOMAINS[p.domain]||null;
+  return `<h3 class="sect">In the combination</h3>
+    ${d?`<p class="why-line"><b>${esc(d[0])}.</b> ${esc(d[1])}.</p>`:""}
+    ${p.mergeInto&&projects[p.mergeInto]?`<p class="note" style="margin:0">Suggested fold-in: becomes part of <b>${esc(projects[p.mergeInto].name)}</b>. ${esc(p.mergeWhy||"")}</p>`:""}
+    ${p.comboNote?`<p class="note" style="margin:0">${esc(p.comboNote)}</p>`:""}
+    ${inc.length?`<div><span class="cl2">Gets help from</span><div class="nlist">${inc.map(x=>{const done=helpScheduled(x.from,p,x.what);return `<div class="nitem info"><button class="link" data-open="${esc(x.from.id)}"><b>${esc(x.from.name)}</b><small>${esc(x.what)}</small></button>${done?`<span class="tag good">Scheduled</span>`:`<button class="btn" data-help="${esc(x.from.id)}|${esc(p.id)}">Schedule</button>`}</div>`}).join("")}</div></div>`:""}
+    ${gives.length?`<div><span class="cl2">Gives to</span><div class="nlist">${gives.map(x=>`<div class="nitem good"><button class="link" data-open="${esc(x.to)}"><b>${esc(projects[x.to].name)}</b><small>${esc(x.what)}</small></button></div>`).join("")}</div></div>`:""}`;
+}
+async function scheduleHelp(key){
+  const [hid,tid]=key.split("|");const h=projects[hid],t=projects[tid];if(!h||!t)return;
+  const link=(h.helps||[]).find(x=>x.to===tid);if(!link)return;
+  const title=helpTitle(t,link.what);if(helpScheduled(h,t,link.what))return toast("Already scheduled.");
+  const nm=nextMs(t);const min=addDays(todayISO(),2);let due=nm?addDays(nm.due,-4):addDays(todayISO(),14);if(due<min)due=min;
+  const p={...h,milestones:[...ms(h),{t:title,due,done:false}]};
+  if(await commit(h,p)){toast(`Scheduled on ${h.name} for ${fmtDate(due)}`);if(editing&&projects[editing.id]){const id=editing.id;closeDrawer();openDrawer(id,false)}else render()}
+}
+function msEditor(list){
+  if(!list.length)return `<p style="margin:0;color:var(--muted);font-size:14px">No milestones yet. Add the next two or three with dates.</p>`;
+  return list.map((m,i)=>`<div class="msrow${m.done?" done":""}"><input type="checkbox" id="msd_${i}" data-md="${i}"${m.done?" checked":""} aria-label="Milestone done"><input id="mst_${i}" data-mt="${i}" value="${esc(m.t)}" placeholder="Milestone"><input id="msu_${i}" data-mu="${i}" type="date" value="${esc(m.due||"")}"><button type="button" class="msx" data-mx="${i}" aria-label="Remove milestone">×</button></div>`).join("");
+}
+function readMs(){const rows=[...document.querySelectorAll("#msEd .msrow")];return rows.map(r=>({t:r.querySelector("[data-mt]").value,due:r.querySelector("[data-mu]").value,done:r.querySelector("[data-md]").checked}))}
+function closeDrawer(){$("#drawerRoot").hidden=true;document.body.style.overflow="";editing=null}
+function collect(){
+  const base=editing.isNew?{id:editing.id}:{...projects[editing.id]};
+  const g=k=>$("#f_"+k)?.value??"";
+  Object.assign(base,{name:g("name").trim(),engine:g("engine"),category:g("category"),purpose:g("purpose"),whatItIs:g("whatItIs"),supposedTo:g("supposedTo"),nearFuture:g("nearFuture"),longTerm:g("longTerm"),character:g("character"),maturity:g("maturity"),state:g("state"),exists:g("exists"),remains:g("remains"),money:+g("money"),revenue:g("revenue"),routes:g("routes"),priority:g("priority"),decision:g("decision"),milestone:g("milestone"),next:g("next"),deadline:g("deadline"),deadlineNote:g("deadlineNote"),lastActivity:g("lastActivity"),strategic:+g("strategic"),effort:+g("effort"),weekOutcome:g("weekOutcome"),notes:g("notes"),updatedAt:todayISO()});
+  base.milestones=readMs().filter(m=>m.t.trim());
+  if(editing.toggleWeek)base.week=!base.week;
+  base.week=!!base.week;base.research=!!base.research;
+  return base;
+}
+async function save(){
+  if(!editing)return;
+  const p=collect();
+  if(!p.name){toast("Give the project a name before saving.");$("#f_name").focus();return}
+  if(p.priority==="P1"&&p.decision!=="Kill"&&!p.next.trim()){toast("Governance rule: an active project needs one next action.");$("#f_next").focus();return}
+  if(editing.toggleWeek&&p.week&&list().filter(x=>x.week&&x.id!==p.id).length>=5){toast("This week already has five outcomes. Remove one first.");editing.toggleWeek=false;return}
+  if(!db){toast("Sign in to save changes.");return}
+  $("#dSave").disabled=true;
+  const isNew=editing.isNew;
+  try{
+    const ok=await commit(isNew?null:projects[p.id],p);
+    if(!ok)return;
+    if(isNew){const n=parseInt(p.id.slice(1),10)+1;if(n>(settings.nextId||0)){settings={...settings,nextId:n};await db.doc("meta/settings").set(settings)}}
+    closeDrawer();render();toast("Saved "+p.id);
+  }finally{$("#dSave").disabled=false}
+}
+
+/* activity log: every change is diffed and recorded per week */
+const PROGRESS_FIELDS=["maturity","revenue","milestone","next","exists","remains","weekDone"];
+const DETAIL_FIELDS={name:"name",category:"category",purpose:"purpose",exists:"what exists",remains:"what remains",routes:"monetization routes",notes:"notes",state:"current state",engine:"engine",whatItIs:"what it is",supposedTo:"what it is supposed to do",nearFuture:"near-future trajectory",longTerm:"long-term destination",character:"current character",strategic:"strategic value",effort:"execution cost"};
+const clip=(s,n=140)=>{s=String(s||"").replace(/\s+/g," ").trim();return s.length>n?s.slice(0,n-1)+"…":s};
+function diffEvents(old,p){
+  const t=new Date().toISOString(),E=[];
+  const add=(kind,o={})=>E.push({t,id:p.id,name:clip(p.name,80),kind,...o});
+  if(!old){add("created",{to:p.maturity});return E}
+  if(p.priority==="PX"&&old.priority!=="PX"){add("archived");return E}
+  if(old.priority==="PX"&&p.priority!=="PX")add("restored");
+  if(old.maturity!==p.maturity){const a=matRange(old.maturity),b=matRange(p.maturity);add(b[1]>a[1]||(b[1]===a[1]&&b[0]>a[0])?"maturity_up":"maturity_down",{from:old.maturity,to:p.maturity})}
+  if(old.revenue!==p.revenue)add("revenue",{from:old.revenue,to:p.revenue});
+  if(old.money!==p.money)add("money",{from:old.money,to:p.money});
+  if(old.priority!==p.priority&&p.priority!=="PX")add("priority",{from:old.priority,to:p.priority});
+  if(old.decision!==p.decision&&p.priority!=="PX")add("decision",{from:old.decision,to:p.decision});
+  if((old.milestone||"")!==(p.milestone||"")&&p.milestone)add("milestone",{text:clip(p.milestone)});
+  if((old.next||"")!==(p.next||"")&&old.next)add("next_changed",{from:clip(old.next),text:clip(p.next)});
+  if((old.deadline||"")!==(p.deadline||""))add("deadline",{from:old.deadline||"",to:p.deadline||""});
+  if(!!old.week!==!!p.week)add(p.week?"week_in":"week_out",{text:clip(p.weekOutcome)});
+  if(!old.weekDone&&p.weekDone)add("outcome_done",{text:clip(p.weekOutcome||p.next)});
+  if(old.weekDone&&!p.weekDone&&p.week)add("outcome_reopened",{text:clip(p.weekOutcome)});
+  if((old.weekOutcome||"")!==(p.weekOutcome||"")&&p.weekOutcome&&p.week&&!!old.week===!!p.week)add("outcome_set",{text:clip(p.weekOutcome)});
+  const om=Array.isArray(old.milestones)?old.milestones:[],pm=Array.isArray(p.milestones)?p.milestones:[];
+  pm.forEach(m=>{const o=om.find(x=>x.t===m.t);
+    if(m.done&&!(o&&o.done))add("milestone_done",{text:clip(m.t)});
+    else if(!o)add("milestone_added",{text:clip(m.t),to:m.due||""});
+    else if((o.due||"")!==(m.due||"")&&!m.done)add("milestone_moved",{text:clip(m.t),from:o.due||"",to:m.due||""});
+  });
+  const det=Object.keys(DETAIL_FIELDS).filter(k=>nv(old[k])!==nv(p[k]));
+  if(det.length)add("details",{fields:det.map(k=>DETAIL_FIELDS[k])});
+  if(!E.length&&old.lastActivity!==p.lastActivity&&p.lastActivity===todayISO())add("logged");
+  return E;
+}
+const nv=v=>v===false||v==null?"":String(v);
+function msDone(x){return (Array.isArray(x&&x.milestones)?x.milestones:[]).filter(m=>m.done).length}
+function madeProgress(old,p){return !old||msDone(old)!==msDone(p)||PROGRESS_FIELDS.some(k=>nv(old[k])!==nv(p[k]))||(old.lastActivity!==p.lastActivity)}
+async function commit(old,p,extra=[]){
+  if(!db){toast("Sign in to save changes.");return false}
+  // a real change of substance counts as meaningful activity today, unless a date was chosen by hand
+  if(madeProgress(old,p)&&(!old||old.lastActivity===p.lastActivity))p.lastActivity=todayISO();
+  p.updatedAt=todayISO();
+  let evts=diffEvents(old,p);
+  if(extra.length){const t=new Date().toISOString();evts=evts.filter(e=>e.kind!=="logged").concat(extra.map(x=>({t,id:p.id,name:clip(p.name,80),...x})))}
+  try{await db.doc("projects/"+p.id).set(p);projects[p.id]=p}
+  catch(e){toast(e&&e.code==="invalid_argument"?"You can view this register but not edit it.":"Could not save. Check your connection and try again.");return false}
+  if(evts.length)logEvents(evts);
+  return true;
+}
+let activity={}, logQueue=Promise.resolve(), actUnsub=null, storedReview={}, genTimer=null;
+function logEvents(evts,wk=weekId(new Date())){
+  logQueue=logQueue.then(async()=>{
+    const ref=db.doc("activity/"+wk);const s=await ref.get();
+    const cur=s.exists?(s.data().events||[]):[];
+    const next=cur.concat(evts).slice(-1200);
+    await ref.set({week:wk,events:next});
+    activity[wk]=next;scheduleGen();
+    if(tab==="review"&&reviewWeek===wk)renderReview();
+  }).catch(()=>toast("Change saved, but the activity log could not be updated."));
+}
+
+/* the review writes itself from the week's activity plus the register's current state */
+function generateReview(wk){
+  const ev=activity[wk]||[];const L=list().filter(p=>p.priority!=="PX");
+  const P=id=>projects[id];const by={};ev.forEach(e=>(by[e.id]=by[e.id]||[]).push(e));
+  const has=(id,k)=>(by[id]||[]).some(e=>k.includes(e.kind));
+  const earning=p=>p.revenue==="active"||p.revenue==="recurring";
+  const it=(id,text,tone)=>({id,text,tone:tone||""});
+  const A=[];
+  // 1 money
+  const q1=[];
+  ev.filter(e=>e.kind==="revenue").forEach(e=>q1.push(it(e.id,`${e.name}: revenue moved from ${e.from} to ${e.to}`,(e.to==="active"||e.to==="recurring")?"good":"warn")));
+  L.filter(earning).forEach(p=>{if(q1.some(x=>x.id===p.id))return;const n=(by[p.id]||[]).length;q1.push(n?it(p.id,`${p.name} earns (${p.revenue}) and had ${n} update${n>1?"s":""} this week`,"good"):it(p.id,`${p.name} earns (${p.revenue}) but had no activity logged this week`,"warn"))});
+  A.push(q1.length?q1:[it(null,"No project is marked as earning yet. Set Current revenue on the products that take payments.","warn")]);
+  // 2 moved closer
+  const q2=[];
+  ev.forEach(e=>{
+    if(e.kind==="maturity_up")q2.push(it(e.id,`${e.name} moved up from ${e.from} to ${e.to}`,"good"));
+    else if(e.kind==="outcome_done")q2.push(it(e.id,`${e.name}: weekly outcome done${e.text?" - "+e.text:""}`,"good"));
+    else if(e.kind==="milestone")q2.push(it(e.id,`${e.name} reached a new milestone: ${e.text}`,"good"));
+    else if(e.kind==="next_changed")q2.push(it(e.id,`${e.name} moved past "${e.from}"`));
+    else if(e.kind==="milestone_done")q2.push(it(e.id,`${e.name}: milestone done - ${e.text}`,"good"));
+    else if(e.kind==="update")q2.push(it(e.id,`${e.name}: ${e.text}`,"good"));
+    else if(e.kind==="created")q2.push(it(e.id,`${e.name} entered the register at ${e.to}`));
+  });
+  A.push(q2.length?q2:[it(null,"No progress recorded yet this week. Mark outcomes done, raise a maturity level or update a next action as work happens.","warn")]);
+  // 3 forgotten
+  const q3=L.filter(isForgotten).sort((a,b)=>score(b).total-score(a).total).slice(0,5).map(p=>{const d=daysSince(p.lastActivity);return it(p.id,`${p.name} (${p.priority}, score ${score(p).total}) - ${d===Infinity?"no activity ever logged":d+" days untouched"}`,p.priority==="P1"?"bad":"warn")});
+  A.push(q3.length?q3:[it(null,"Nothing has gone quiet past the threshold.","good")]);
+  // 4 deadlines
+  const q4=L.filter(p=>p.deadline).map(p=>[p,daysUntil(p.deadline)]).filter(([,d])=>d<=90).sort((a,b)=>a[1]-b[1]).map(([p,d])=>it(p.id,`${p.name}: ${d<0?Math.abs(d)+" days overdue":d===0?"due today":"due in "+d+" days"} (${p.deadline})${p.deadlineNote?" - "+p.deadlineNote:""}`,d<0?"bad":d<=30?"warn":""));
+  L.filter(active).forEach(p=>ms(p).filter(m=>!m.done&&m.due&&daysUntil(m.due)<=21).forEach(m=>{const d=daysUntil(m.due);q4.push(it(p.id,`${p.name} milestone: ${m.t} - ${dueText(m.due)}`,d<0?"bad":d<=7?"warn":""))}));
+  ev.filter(e=>e.kind==="milestone_moved"&&e.to>e.from&&e.from).forEach(e=>q4.push(it(e.id,`${e.name}: "${e.text}" slipped from ${e.from} to ${e.to}`,"warn")));
+  ev.filter(e=>e.kind==="deadline"&&e.to).forEach(e=>{if(!q4.some(x=>x.id===e.id))q4.push(it(e.id,`${e.name}: deadline set to ${e.to} this week`))});
+  A.push(q4.length?q4:[it(null,"No external deadline inside the next 90 days.","good")]);
+  // 5 finishable
+  const q5=L.filter(p=>{const [lo,hi]=matRange(p.maturity);return !["Park","Kill"].includes(p.decision)&&(p.effort||2)<=2&&(p.decision==="Finish"||(lo>=3&&hi<=5))}).sort((a,b)=>(a.effort||2)-(b.effort||2)||matRange(b.maturity)[1]-matRange(a.maturity)[1]||score(b).total-score(a).total).slice(0,4).map(p=>it(p.id,`${p.name} (${p.maturity}, ${(p.effort||2)===1?"low":"medium"} effort) - next: ${clip(p.next,110)||"set a next action"}`));
+  A.push(q5.length?q5:[it(null,"No project is both near completion and low effort.","")]);
+  // 6 attention without evidence of value
+  const PROG=["maturity_up","revenue","outcome_done","milestone","created","update","milestone_done"];
+  const q6=Object.keys(by).filter(id=>P(id)&&by[id].length>=3&&!has(id,PROG)&&!earning(P(id))).map(id=>it(id,`${P(id).name}: ${by[id].length} updates this week, no maturity, milestone, outcome or revenue change`,"warn"));
+  L.filter(p=>p.week&&!p.weekDone&&(by[p.id]||[]).length===0).forEach(p=>q6.push(it(p.id,`${p.name} holds a slot in this week's five with no activity yet`,"warn")));
+  A.push(q6.length?q6:[it(null,"Nothing flagged. Projects that got attention also showed progress or earn.","good")]);
+  // 7 delegate
+  const q7=[];
+  L.filter(p=>p.decision==="Delegate").forEach(p=>q7.push(it(p.id,`${p.name} is marked Delegate - next: ${clip(p.next,100)}`)));
+  L.filter(p=>p.decision==="Maintain"&&(by[p.id]||[]).length).forEach(p=>q7.push(it(p.id,`${p.name} is in maintenance and took your time this week. Routine upkeep could be handed off.`)));
+  L.filter(p=>p.decision!=="Delegate"&&/document|template|catalogue|inventory|checklist|audit|populate/i.test(p.next||"")&&!q7.some(x=>x.id===p.id)).slice(0,3).forEach(p=>q7.push(it(p.id,`${p.name}: "${clip(p.next,90)}" is structured work AI or an assistant could draft`)));
+  A.push(q7.length?q7:[it(null,"No obvious hand-offs this week.","")]);
+  // 8 park
+  const q8=[];
+  L.filter(p=>["P3","P4"].includes(p.priority)&&p.decision!=="Park"&&(by[p.id]||[]).length).forEach(p=>q8.push(it(p.id,`${p.name} (${p.priority}) drew attention this week. Park it unless it earned that time.`,"warn")));
+  L.filter(p=>!["Park","Kill"].includes(p.decision)&&p.priority!=="P1"&&isForgotten(p)).sort((a,b)=>score(a).total-score(b).total).slice(0,3).forEach(p=>q8.push(it(p.id,`${p.name} (score ${score(p).total}) is untouched and low-ranked. Park it deliberately.`)));
+  A.push(q8.length?q8:[it(null,"Nothing needs parking.","good")]);
+  // 9 next five
+  const carry=L.filter(p=>p.week&&!p.weekDone).map(p=>it(p.id,`Carry over: ${p.name}${p.weekOutcome?" - "+p.weekOutcome:""}`,"warn"));
+  const pool=L.filter(p=>!(p.week&&!p.weekDone)&&!["Park","Kill"].includes(p.decision)).sort((a,b)=>{const da=daysUntil(a.deadline),db_=daysUntil(b.deadline);const ua=da!=null&&da<=60?1:0,ub=db_!=null&&db_<=60?1:0;return ub-ua||score(b).total-score(a).total});
+  const q9=carry.slice(0,5);pool.slice(0,5-q9.length).forEach(p=>q9.push(it(p.id,`${p.name} - ${clip(p.next,110)}`)));
+  A.push(q9);
+  const touched=Object.keys(by).length;
+  return {week:wk,events:ev.length,projects:touched,answers:A,generatedAt:new Date().toISOString()};
+}
+function scheduleGen(){clearTimeout(genTimer);genTimer=setTimeout(saveGenerated,1500)}
+async function saveGenerated(){
+  if(!db||!loaded)return;
+  const wk=weekId(new Date());const g=generateReview(wk);
+  const prev=storedReview[wk]&&storedReview[wk].generated;
+  const strip=x=>x&&JSON.stringify({a:x.answers,e:x.events});
+  if(strip(prev)===strip(g))return;
+  const doc={...(storedReview[wk]||{}),week:wk,generated:g,generatedAt:g.generatedAt};
+  try{await db.doc("reviews/"+wk).set(doc);storedReview[wk]=doc}catch(_){}
+}
+async function archive(){
+  if(!editing||editing.isNew)return;
+  const b=$("#dDelete");
+  if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Tap again to archive";setTimeout(()=>{b.dataset.armed="";b.textContent="Archive (PX)"},3000);return}
+  b.dataset.armed="";b.textContent="Archive (PX)";
+  $("#f_priority").value="PX";$("#f_decision").value="Kill";
+  await save();
+}
+
+/* focus: the nudge screen shown on open */
+function signals(){
+  const L=list().filter(active),wk=weekId(new Date()),ev=activity[wk]||[];
+  const items=[];L.forEach(p=>ms(p).forEach((m,i)=>{if(!m.done&&m.due)items.push({p,m,i,d:daysUntil(m.due)})}));
+  const pr=p=>({P1:0,P2:1,P3:2,P4:3}[p.priority]??4);
+  const overdue=items.filter(x=>x.d<0).sort((a,b)=>pr(a.p)-pr(b.p)||a.d-b.d);
+  const soon=items.filter(x=>x.d>=0&&x.d<=14).sort((a,b)=>a.d-b.d||pr(a.p)-pr(b.p));
+  const later=items.filter(x=>x.d>14&&x.d<=45).sort((a,b)=>a.d-b.d);
+  const earning=p=>p.revenue==="active"||p.revenue==="recurring";
+  const att=[];
+  L.filter(p=>earning(p)&&daysSince(p.lastActivity)>=14).forEach(p=>{const d=daysSince(p.lastActivity);att.push({p,tone:"bad",why:`Earns money but ${d===Infinity?"no work has been logged on it yet":"untouched for "+d+" days"}`})});
+  L.filter(p=>p.priority==="P1"&&!earning(p)&&daysSince(p.lastActivity)>=10).forEach(p=>{const d=daysSince(p.lastActivity);att.push({p,tone:"warn",why:`P1 and ${d===Infinity?"no work logged yet":"quiet for "+d+" days"}`})});
+  L.filter(p=>["P1","P2"].includes(p.priority)&&!nextMs(p)).forEach(p=>att.push({p,tone:"warn",why:"No dated milestone ahead. Add one so it can't drift."}));
+  L.filter(p=>["P1","P2"].includes(p.priority)&&!(p.next||"").trim()).forEach(p=>att.push({p,tone:"warn",why:"No next action set"}));
+  const by={};ev.forEach(e=>(by[e.id]=by[e.id]||[]).push(e));
+  const PROGK=["maturity_up","revenue","outcome_done","milestone","created","update","milestone_done"];
+  const drift=[];
+  Object.keys(by).forEach(id=>{const p=projects[id];if(!p)return;
+    if(["P3","P4"].includes(p.priority)||p.decision==="Park")drift.push({p,why:`${p.priority} ${p.decision==="Park"?"(parked) ":""}project took ${by[id].length} change${by[id].length>1?"s":""} this week while P1 work waits`});
+    else if(by[id].length>=3&&!by[id].some(e=>PROGK.includes(e.kind))&&!earning(p))drift.push({p,why:`${by[id].length} edits this week, no milestone, outcome or maturity movement`});
+  });
+  ev.filter(e=>e.kind==="milestone_moved"&&e.from&&e.to>e.from).forEach(e=>{const p=projects[e.id];if(p&&!drift.some(x=>x.p.id===p.id))drift.push({p,why:`"${e.text}" was pushed back from ${fmtDate(e.from)} to ${fmtDate(e.to)}`})});
+  const p1=L.filter(p=>p.priority==="P1").length;
+  return {overdue,soon,later,att,drift,p1,wkDone:L.filter(p=>p.week&&p.weekDone).length,wkN:L.filter(p=>p.week).length};
+}
+function headline(S){
+  const name=(x)=>x.p.name;
+  if(S.overdue.length){const x=S.overdue[0];return [`${S.overdue.length} milestone${S.overdue.length>1?"s are":" is"} overdue. Start with ${name(x)}.`,`"${x.m.t}" was due ${fmtDate(x.m.due)}. Finish it, or move the date honestly so the plan stays true.`]}
+  const t=S.soon.filter(x=>x.d<=3);
+  if(t.length){const x=t[0];return [`${name(x)}: ${dueText(x.m.due)}.`,`"${x.m.t}". ${t.length>1?`${t.length-1} more milestone${t.length>2?"s":""} land in the next three days.`:"Clear this before starting anything new."}`]}
+  const money=S.att.find(a=>a.tone==="bad");
+  if(money)return [`${money.p.name} pays you. Give it some time this week.`,`${money.why}. Protecting live revenue comes before new builds.`];
+  if(S.soon.length){const x=S.soon[0];return [`On track. Next up: ${name(x)}, ${dueText(x.m.due)}.`,`"${x.m.t}". ${S.soon.length} milestone${S.soon.length>1?"s":""} fall in the next two weeks.`]}
+  return ["Nothing urgent. Good week to move a build forward.","Pick from the candidates below, or finish a milestone early."];
+}
+function nitem(p,title,sub,tone,action){return `<div class="nitem ${tone}"><button class="link" data-open="${esc(p.id)}"><b>${esc(title)}</b><small>${esc(sub)}</small></button>${action||""}</div>`}
+function weekHTML(){
+  const L=list();const wk=L.filter(p=>p.week);
+  const layerOf=p=>p.research||p.deadline?"research":(p.revenue==="active"||p.revenue==="recurring")?"revenue":p.engine==="creative"||p.engine==="heritage"?"creative":p.decision==="Maintain"?"maint":"build";
+  const LAY=[["revenue","Core revenue",3],["build","Major build",2],["creative","Creative / IP",1],["research","Research / deadline",2],["maint","Maintenance",99]];
+  const cnt=k=>wk.filter(p=>layerOf(p)===k).length;
+  const sugg=L.filter(p=>!p.week&&active(p)).sort((a,b)=>score(b).total-score(a).total).slice(0,5);
+  return `<div class="panel"><h2>This week's five</h2>
+    <p class="sub">Week ${esc(weekId(new Date()))}. Tick an outcome when it's done. Unfinished ones carry into next week automatically.</p>
+    <div class="five">${wk.length?wk.map((p,i)=>`<div class="out${p.weekDone?" done":""}"><label class="tick"><input type="checkbox" id="wd_${esc(p.id)}" data-done="${esc(p.id)}"${p.weekDone?" checked":""} aria-label="Mark ${esc(p.name)} outcome done"><span class="n">${i+1}</span></label><div><input id="wo_${esc(p.id)}" data-wo="${esc(p.id)}" value="${esc(p.weekOutcome)}" placeholder="Outcome for ${esc(p.name)}"><small>${esc(p.id)} · ${esc(p.name)}${nextMs(p)?" · next milestone "+esc(dueText(nextMs(p).due)):""}</small></div><button class="btn" data-unweek="${esc(p.id)}">Remove</button></div>`).join(""):`<div class="empty">No outcomes picked yet. Add from the candidates below.</div>`}</div>
+    ${wk.length>5?`<p class="note" style="margin-top:12px">${wk.length} outcomes is more than five. Defer ${wk.length-5}.</p>`:""}
+  </div>
+  <div class="panel"><h2>Load by layer</h2><p class="sub">From the scheduling system. Red means a layer is overloaded this week.</p>
+    <div class="layers">${LAY.map(([k,l,m])=>`<div class="layer${cnt(k)>m?" over":""}"><b>${l}</b>${cnt(k)} active · max ${m===99?"several":m}</div>`).join("")}</div></div>
+  <div class="panel"><h2>Next in line</h2><p class="sub">Highest decision scores not yet in this week's five.</p>
+    <div class="five">${sugg.map(p=>`<div class="out"><span class="n" style="font-size:13px;font-family:var(--f-mono)">${score(p).total}</span><div><b>${esc(p.name)}</b><small>${esc(p.id)} · ${esc(nextMs(p)?nextMs(p).t+" ("+dueText(nextMs(p).due)+")":p.next||"")}</small></div><button class="btn" data-week="${esc(p.id)}"${wk.length>=5?" disabled":""}>Add</button></div>`).join("")}</div></div>`;
+}
+function helpPanel(){
+  const targets=list().filter(p=>active(p)&&(p.week||p.priority==="P1")&&nextMs(p)&&daysUntil(nextMs(p).due)<=45).sort((a,b)=>nextMs(a).due.localeCompare(nextMs(b).due));
+  const rows=[];targets.forEach(t=>incoming(t.id).forEach(x=>{if(active(x.from)&&!helpScheduled(x.from,t,x.what))rows.push({t,x})}));
+  if(!rows.length)return "";
+  return `<div class="panel"><h2>Bring in help</h2><p class="sub">Other parts of the portfolio that can carry your near-term work. Schedule one and it becomes a dated milestone on the helping project, four days before the work it supports.</p><div class="nlist">${rows.slice(0,8).map(({t,x})=>`<div class="nitem info"><button class="link" data-open="${esc(t.id)}"><b>${esc(x.from.name)} → ${esc(t.name)}</b><small>${esc(x.what)}</small></button><button class="btn" data-help="${esc(x.from.id)}|${esc(t.id)}">Schedule</button></div>`).join("")}</div>${rows.length>8?`<p class="sub" style="margin-top:8px">${rows.length-8} more inside each project.</p>`:""}</div>`;
+}
+function renderFocus(){
+  const el=$("#tab-focus");
+  if(!loaded||!list().length){el.innerHTML=`<div class="hero"><small>Focus</small><h2>${loaded?"The register is empty":"Loading your portfolio"}</h2><p>${loaded?(db?"Import the data file from the Claude version to bring in all your projects, or add projects in the Register tab.":"Sign in to load your projects."):"One moment."}</p>${loaded&&db?`<div class="quick" style="margin-top:12px"><label class="filebtn">Import data file<input id="dataImport" type="file" accept=".json,application/json"></label></div><p class="sub" id="dataMsg" style="margin-top:8px"></p>`:""}</div>`;return}
+  const S=signals(),[h,sub]=headline(S),hr=new Date().getHours();
+  const greet=hr<12?"Good morning":hr<17?"Good afternoon":"Good evening";
+  const doneBtn=(x)=>`<button class="btn" data-msdone="${esc(x.p.id)}|${x.i}">Done</button>`;
+  const attU=[];const seen=new Set();S.att.forEach(a=>{const k=a.p.id+a.why;if(!seen.has(k)){seen.add(k);attU.push(a)}});
+  el.innerHTML=`<div class="hero"><small>${greet}, Arc · ${new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"})}</small><h2>${esc(h)}</h2><p>${esc(sub)}</p>
+    <div class="pulse">
+      <button class="${S.overdue.length?"bad":"good"}" data-go="overdue"><b>${S.overdue.length}</b><span>Overdue milestones</span></button>
+      <button class="${S.soon.length?"warn":""}" data-go="soon"><b>${S.soon.length}</b><span>Due in 14 days</span></button>
+      <button class="${attU.length?"warn":"good"}" data-jump="att"><b>${attU.length}</b><span>Need attention</span></button>
+      <button class="${S.wkDone===S.wkN&&S.wkN?"good":""}" data-jump="five"><b>${S.wkDone}/${S.wkN||5}</b><span>Week's outcomes done</span></button>
+    </div></div>
+  ${S.overdue.length?`<div class="panel"><h2>Overdue</h2><p class="sub">Finish these first, or change the date so the timeline stays honest.</p><div class="nlist">${S.overdue.slice(0,8).map(x=>nitem(x.p,x.m.t,`${x.p.name} · ${x.p.priority} · ${dueText(x.m.due)}`,"bad",doneBtn(x))).join("")}</div>${S.overdue.length>8?`<p class="sub" style="margin-top:8px">${S.overdue.length-8} more in the Roadmap.</p>`:""}</div>`:""}
+  <div class="panel"><h2>Due in the next two weeks</h2>${S.soon.length?`<div class="nlist">${S.soon.map(x=>nitem(x.p,x.m.t,`${x.p.name} · ${x.p.priority} · ${dueText(x.m.due)}`,x.d<=3?"warn":"info",doneBtn(x))).join("")}</div>`:`<p class="sub">Nothing due in the next 14 days.</p>`}</div>
+  <div id="five">${weekHTML()}</div>
+  ${helpPanel()}
+  <div class="panel" id="att"><h2>Needs attention</h2><p class="sub">Money that's being neglected, P1s going quiet, and projects without a dated next step.</p>${attU.length?`<div class="nlist">${attU.slice(0,10).map(a=>nitem(a.p,a.p.name,a.why,a.tone,"")).join("")}</div>${attU.length>10?`<p class="sub" style="margin-top:8px">${attU.length-10} more. Open the Register's Forgotten view.</p>`:""}`:`<p class="sub">Nothing flagged.</p>`}
+    ${S.p1>12?`<p class="note" style="margin-top:10px">${S.p1} projects are marked P1. The system works best with about ten. Move some to P2.</p>`:""}</div>
+  <div class="panel"><h2>Drifting</h2><p class="sub">Where time went this week without moving the plan.</p>${S.drift.length?`<div class="nlist">${S.drift.map(d=>nitem(d.p,d.p.name,d.why,"warn","")).join("")}</div>`:`<p class="sub">No drift detected this week.</p>`}</div>
+  <div class="panel"><h2>Coming up</h2><p class="sub">Milestones 15 to 45 days out. Start the bigger ones now.</p>${S.later.length?`<div class="nlist">${S.later.map(x=>nitem(x.p,x.m.t,`${x.p.name} · ${fmtDate(x.m.due)}`,"info","")).join("")}</div>`:`<p class="sub">Nothing in that window.</p>`}</div>`;
+}
+async function markMsDone(key){
+  const [id,idx]=key.split("|");const old=projects[id];if(!old)return;
+  const m=ms(old).map((x,i)=>i===+idx?{...x,done:true}:x);
+  if(await commit(old,{...old,milestones:m})){render();toast("Milestone done. Logged for the review.")}
+}
+/* roadmap */
+let rmPri="all",rmDone=false;
+function renderRoadmap(){
+  const el=$("#tab-roadmap");
+  const L=list().filter(p=>p.priority!=="PX"&&(rmPri==="all"||(rmPri==="p1"?p.priority==="P1":["P1","P2"].includes(p.priority))));
+  const rows=[];L.forEach(p=>ms(p).forEach((m,i)=>{if(m.due&&(rmDone||!m.done))rows.push({p,m,i})}));
+  rows.sort((a,b)=>a.m.due.localeCompare(b.m.due));
+  const today=todayISO(),groups={};
+  rows.forEach(r=>{let k=!r.m.done&&r.m.due<today?"0000-overdue":r.m.due.slice(0,4)>="2028"?"2028-plus":r.m.due.slice(0,7);(groups[k]=groups[k]||[]).push(r)});
+  const label=k=>k==="0000-overdue"?"Overdue":k==="2028-plus"?"2028 and beyond":new Date(k+"-15T12:00:00").toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  const noMs=L.filter(p=>active(p)&&!nextMs(p));
+  el.innerHTML=`<div class="panel"><h2>Roadmap</h2><p class="sub">Every dated milestone across the portfolio, month by month. Mapped on 5 October 2026 from the register and the Purpose Bible. Dates are targets unless a project's deadline says otherwise.</p>
+    <div class="rmfilters">${[["all","All priorities"],["p12","P1 and P2"],["p1","P1 only"]].map(([k,l])=>`<button class="chip" aria-pressed="${rmPri===k}" data-rmpri="${k}">${l}</button>`).join("")}<button class="chip" aria-pressed="${rmDone}" data-rmdone="1">Show finished</button></div>
+    ${Object.keys(groups).sort().map(k=>`<div class="month"><h3>${esc(label(k))}<span>${groups[k].length}</span></h3>${groups[k].map(r=>{const late=!r.m.done&&r.m.due<today;return `<button class="rmrow${r.m.done?" done":""}${late?" late":""}" data-open="${esc(r.p.id)}"><span class="d">${esc(new Date(r.m.due+"T12:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short"}))}</span><span><span class="t">${esc(r.m.t)}</span><span class="who">${esc(r.p.id)} · ${esc(r.p.name)} · ${esc(r.p.priority)}</span></span></button>`}).join("")}</div>`).join("")||`<p class="sub">No milestones in this filter.</p>`}
+    ${noMs.length?`<p class="note">${noMs.length} active project${noMs.length>1?"s have":" has"} no dated milestone ahead: ${esc(noMs.map(p=>p.name).join(", "))}.</p>`:""}
+  </div>`;
+}
+
+async function setWeek(id,on){
+  if(!db)return toast("Sign in to save changes.");
+  if(on&&list().filter(p=>p.week).length>=5)return toast("This week already has five outcomes.");
+  const p={...projects[id],week:on};if(!on){p.weekOutcome="";p.weekDone=false}
+  if(await commit(projects[id],p)){render();toast(on?"Added to this week":"Removed from this week")}
+}
+async function setDone(id,done){
+  const p={...projects[id],weekDone:done};
+  if(await commit(projects[id],p)){render();toast(done?"Outcome done. Logged for the review.":"Outcome reopened")}
+}
+let woTimer={};
+function onWeekOutcome(id,val){clearTimeout(woTimer[id]);woTimer[id]=setTimeout(async()=>{if(!db||projects[id].weekOutcome===val)return;await commit(projects[id],{...projects[id],weekOutcome:val})},900)}
+
+/* review tab */
+const KIND_LABEL={created:"Added",archived:"Archived",restored:"Restored",maturity_up:"Maturity up",maturity_down:"Maturity down",revenue:"Revenue",money:"Money score",priority:"Priority",decision:"Decision",milestone:"Milestone",next_changed:"Next action",deadline:"Deadline",week_in:"Into the five",week_out:"Out of the five",outcome_done:"Outcome done",outcome_reopened:"Outcome reopened",outcome_set:"Outcome set",details:"Details",logged:"Work logged",update:"Update",milestone_done:"Milestone done",milestone_added:"Milestone added",milestone_moved:"Milestone moved"};
+function eventText(e){
+  switch(e.kind){
+    case "maturity_up":case "maturity_down":return `${e.from} → ${e.to}`;
+    case "revenue":case "priority":case "decision":return `${e.from} → ${e.to}`;
+    case "money":return `${e.from} → ${e.to} coins`;
+    case "milestone":return e.text;
+    case "next_changed":return `now: ${e.text||"(cleared)"}`;
+    case "deadline":return e.to?`set to ${e.to}`:"cleared";
+    case "outcome_done":case "outcome_set":case "week_in":return e.text||"";
+    case "details":return "edited "+(e.fields||[]).join(", ");
+    case "created":return "at "+e.to;
+    case "update":return e.text||"";
+    case "milestone_done":return e.text||"";
+    case "milestone_added":return `${e.text}${e.to?" · "+e.to:""}`;
+    case "milestone_moved":return `${e.text} · ${e.from||"no date"} → ${e.to||"no date"}`;
+    default:return "";
+  }
+}
+function renderReview(){
+  const el=$("#tab-review");const cur=weekId(new Date());const isCur=reviewWeek===cur;
+  let g=null,stale=false;
+  if(isCur&&loaded)g=generateReview(cur);
+  else if(storedReview[reviewWeek]&&storedReview[reviewWeek].generated)g=storedReview[reviewWeek].generated;
+  else if(activity[reviewWeek]&&activity[reviewWeek].length){g=generateReview(reviewWeek);stale=true}
+  const notes=(storedReview[reviewWeek]||{}).notes||"";
+  const ev=(activity[reviewWeek]||[]).slice().reverse();
+  const days={};ev.forEach(e=>{const d=new Date(e.t).toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});(days[d]=days[d]||[]).push(e)});
+  const Qs=QUESTIONS.concat("What are the five outcomes for next week?");
+  el.innerHTML=`<div class="panel"><div class="weekpick"><button class="btn" id="wkPrev" aria-label="Previous week">‹</button><b style="font-family:var(--f-mono)">${esc(reviewWeek)}</b><button class="btn" id="wkNext" aria-label="Next week"${isCur?" disabled":""}>›</button>${isCur?"":`<button class="btn" id="wkNow">This week</button>`}</div>
+    <h2>Weekly review</h2>
+    <p class="sub">${isCur?"Written automatically from what you do in the app, and updated with every change.":"The review as it stood at the end of that week."} ${g?`<b>${g.events}</b> recorded change${g.events===1?"":"s"} across <b>${g.projects}</b> project${g.projects===1?"":"s"}.`:""}${stale?" Rebuilt from that week's log against today's register.":""}</p>
+    ${g?`<div class="qa">${g.answers.map((items,i)=>`<section class="qblock"><h3>${i+1}. ${esc(Qs[i])}</h3><ul>${items.map(x=>`<li class="${esc(x.tone)}">${x.id?`<button class="link" data-open="${esc(x.id)}">${esc(x.text)}</button>`:esc(x.text)}</li>`).join("")}</ul></section>`).join("")}</div>`:`<div class="empty"><h2>No record for this week</h2>The log started on 5 October 2026. Weeks before that have no activity to review.</div>`}
+  </div>
+  <div class="panel"><h2>Your notes</h2><p class="sub">Optional. Anything the app could not see, such as a client call or an offline payment.</p>
+    <div class="f"><label for="rvNotes">Notes for ${esc(reviewWeek)}</label><textarea id="rvNotes" rows="3">${esc(notes)}</textarea></div></div>
+  <div class="panel"><h2>Activity log</h2><p class="sub">Every change recorded this week, newest first.</p>
+    ${ev.length?Object.entries(days).map(([d,es])=>`<div class="day"><h4>${esc(d)}</h4>${es.map(e=>`<button class="logrow" data-open="${esc(e.id)}"><span class="lt">${new Date(e.t).toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"})}</span><span class="lk k-${esc(e.kind)}">${esc(KIND_LABEL[e.kind]||e.kind)}</span><span class="ln"><b>${esc(e.name)}</b> ${esc(eventText(e))}</span></button>`).join("")}</div>`).join(""):`<div class="empty">Nothing recorded yet. Save a project, log work, or tick an outcome and it shows here.</div>`}
+  </div>`;
+}
+async function loadWeek(wk){
+  if(!db)return;
+  try{
+    if(!activity[wk]){const a=await db.doc("activity/"+wk).get();activity[wk]=a.exists?(a.data().events||[]):[]}
+    if(!storedReview[wk]){const r=await db.doc("reviews/"+wk).get();storedReview[wk]=r.exists?{...r.data()}:{}}
+  }catch(_){}
+}
+async function subscribeReview(){renderReview();await loadWeek(reviewWeek);if(tab==="review")renderReview()}
+let notesTimer=null;
+function onNotes(val){clearTimeout(notesTimer);notesTimer=setTimeout(async()=>{
+  if(!db)return toast("Sign in to save changes.");
+  const wk=reviewWeek;const doc={...(storedReview[wk]||{}),week:wk,notes:val};
+  try{await db.doc("reviews/"+wk).set(doc);storedReview[wk]=doc}catch(e){toast("Could not save your notes.")}
+},800)}
+function shiftWeek(n){const [y,w]=reviewWeek.split("-W").map(Number);const d=new Date(Date.UTC(y,0,4));d.setUTCDate(d.getUTCDate()-((d.getUTCDay()||7)-1)+(w-1+n)*7);reviewWeek=weekId(new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));subscribeReview()}
+
+
+/* project updates: dictate or paste, Claude proposes field changes, you confirm */
+let sample=null, assets=null, imgLimits=null;
+let upd={focus:"",text:"",files:[],stage:"compose",proposal:null,ctl:null,error:""};
+const UF={maturity:["Maturity","select",()=>MATS],state:["Current state","text"],character:["Current character","text"],revenue:["Current revenue","select",()=>REVENUE],money:["Money score","select",()=>[1,2,3,4,5,6]],priority:["Priority","select",()=>PRIORITIES],decision:["Decision","select",()=>DECISIONS],milestone:["Milestone","text"],next:["Next action","textarea"],exists:["What exists","textarea"],remains:["What remains","textarea"],deadline:["Deadline","date"],deadlineNote:["Deadline note","text"],weekDone:["This week's outcome done","select",()=>["true","false"]],milestones_done:["Milestones finished","textarea"],milestone_add:["New milestone (title | date)","text"],notes_append:["Add to notes","textarea"]};
+function openUpdate(focus){
+  if(!db)return toast("Sign in to add updates.");
+  upd={focus:focus||"",text:"",files:[],stage:"compose",proposal:null,ctl:null,error:""};
+  $("#updRoot").hidden=false;document.body.style.overflow="hidden";renderUpdate();
+  setTimeout(()=>$("#updText")?.focus(),50);
+}
+function closeUpdate(){if(upd.ctl)upd.ctl.abort();upd.files.forEach(f=>f.url&&URL.revokeObjectURL(f.url));$("#updRoot").hidden=true;document.body.style.overflow=""}
+function projOptions(sel,auto){const L=list().filter(p=>p.priority!=="PX").sort((a,b)=>a.id.localeCompare(b.id));return (auto?`<option value="">Let Claude work it out from what I say</option>`:"")+L.map(p=>`<option value="${esc(p.id)}"${p.id===sel?" selected":""}>${esc(p.id)} · ${esc(p.name)}</option>`).join("")}
+function renderUpdate(){
+  const b=$("#uBody"),f=$("#uFoot");
+  if(upd.stage==="compose"){
+    $("#uTitle").textContent="Project update";
+    const canImg=!!(sample&&imgLimits);
+    b.innerHTML=`<div class="f"><label for="updProj">Which project</label><select id="updProj">${projOptions(upd.focus,true)}</select></div>
+      <div class="hint"><span>${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>'}</span><span>Tap the microphone key on your phone keyboard and talk. Say what you did, what changed, what's left and what comes next. Mention several projects if you like.</span></div>
+      <div class="f"><label for="updText">Your update</label><textarea id="updText" placeholder="Spider: finished the Personal Future Map wireframes and tested them with three students. Next I need the trend data model…">${esc(upd.text)}</textarea></div>
+      <div class="f"><label>Screenshots or text files (optional)</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><label class="filebtn">Add files<input id="updFiles" type="file" multiple accept="${canImg?esc(imgLimits.mediaTypes.join(","))+",":""}.txt,.md,.csv,.json,text/plain"></label><small style="color:var(--muted)">${canImg?`Up to ${imgLimits.maxCount} images. Text files are added to your update.`:"Text files are added to your update."}</small></div>
+        ${upd.files.length?`<div class="shots" style="margin-top:8px">${upd.files.map((x,i)=>`<span class="shot"><img src="${x.url}" alt="Attached screenshot ${i+1}"><button data-rmshot="${i}" aria-label="Remove screenshot">×</button></span>`).join("")}</div>`:""}
+      </div>
+      ${upd.error?`<p class="note">${esc(upd.error)}</p>`:""}
+      ${window.ccHasKey&&window.ccHasKey()?"":`<p class="note">Add your free Gemini key in Map → Voice update AI to have updates read and filled in automatically. You can still save the update as a note.</p>`}`;
+    f.innerHTML=`<button class="btn" id="uNote">Save as a note only</button><span class="grow"></span><button class="btn primary" id="uRead"${sample?"":" disabled"}>Read my update</button>`;
+  }else if(upd.stage==="thinking"){
+    b.innerHTML=`<div class="thinking"><span class="dots"><i></i><i></i><i></i></span><span id="uThink">Reading your update and matching it to the register. This can take up to a minute.</span></div>`;
+    f.innerHTML=`<span class="grow"></span><button class="btn" id="uStop">Stop</button>`;
+  }else if(upd.stage==="review"){
+    $("#uTitle").textContent="Check and save";
+    const P=upd.proposal;
+    b.innerHTML=`<p class="sub" style="margin:0;color:var(--muted)">Untick anything you don't want. You can edit every value before saving.</p>
+      ${P.updates.map((u,i)=>{const old=projects[u.projectId]||{};const keys=Object.keys(u.changes);return `<div class="prop">
+        <div class="phead"><select id="u${i}_pid" aria-label="Project for this update">${projOptions(u.projectId,false)}</select></div>
+        <div class="f"><label for="u${i}_sum">Logged as</label><textarea id="u${i}_sum" rows="2">${esc(u.summary)}</textarea></div>
+        ${keys.length?keys.map(k=>{const d=UF[k];const v=u.changes[k];const id=`u${i}_${k}`;let ctl;
+          if(d[1]==="select")ctl=`<select id="${id}_v">${d[2]().map(o=>`<option${String(o)===String(v)?" selected":""}>${esc(o)}</option>`).join("")}</select>`;
+          else if(d[1]==="textarea")ctl=`<textarea id="${id}_v" rows="${k==="next"?2:3}">${esc(v)}</textarea>`;
+          else ctl=`<input id="${id}_v" type="${d[1]}" value="${esc(v)}">`;
+          const was=["notes_append","milestones_done","milestone_add"].includes(k)?"":k==="weekDone"?String(!!old.weekDone):String(old[k]??"");
+          return `<div class="chg" data-row="${id}"><input type="checkbox" id="${id}_c" checked aria-label="Apply ${esc(d[0])}"><div class="cv"><span class="cl">${esc(d[0])}</span>${was&&k!=="exists"&&k!=="remains"?`<span class="was">${esc(clip(was,120))}</span>`:""}${ctl}${u.why&&u.why[k]?`<span class="why">${esc(u.why[k])}</span>`:""}</div></div>`}).join(""):`<p style="margin:0;font-size:14px;color:var(--muted)">No field changes. The update is logged to the project's history.</p>`}
+      </div>`}).join("")}
+      ${(P.newProjects||[]).map((n,i)=>`<div class="prop"><b>Not in the register yet: ${esc(n.name)}</b><span style="font-size:14px">${esc(n.purpose||"")}</span><div><button class="btn" data-newproj="${i}">Add as a new project</button></div></div>`).join("")}
+      ${P.unclear?`<p class="note">Couldn't place: ${esc(P.unclear)}</p>`:""}
+      ${upd.files.length?`<p style="font-size:13px;color:var(--muted);margin:0">${upd.files.length} screenshot${upd.files.length>1?"s":""} will be kept with ${P.updates.length>1?"each update":"this update"}${assets?"":" (screenshots can't be stored in this view, so they won't be kept)"}.</p>`:""}`;
+    f.innerHTML=`<button class="btn" id="uBack">Back</button><span class="grow"></span><button class="btn primary" id="uApply"${P.updates.length?"":" disabled"}>Save ${P.updates.length>1?P.updates.length+" updates":"update"}</button>`;
+  }
+}
+function buildPrompt(text,focus,nImg){
+  const recs=list().filter(p=>p.priority!=="PX").map(p=>({id:p.id,name:p.name,category:p.category,whatItIs:p.whatItIs||"",supposedTo:p.supposedTo||"",nearFuture:p.nearFuture||"",maturity:p.maturity,state:p.state,revenue:p.revenue,money:p.money,priority:p.priority,decision:p.decision,exists:p.exists,remains:p.remains,next:p.next,milestone:p.milestone||"",deadline:p.deadline||"",inThisWeek:!!p.week,weekOutcome:p.weekOutcome||"",notes:p.notes||"",milestones:ms(p).map(m=>({title:m.t,due:m.due,done:!!m.done}))}));
+  return `You maintain a project register for Prof Newrock, an architect and founder of BuildNET in Ibadan, Nigeria. He has just dictated a progress update${nImg?` and attached ${nImg} screenshot(s) from the project's app, files or messages - read them for evidence`:""}. Turn it into precise field updates.
+
+Today is ${todayISO()}.
+${focus?`He says this update is about ${focus} (${projects[focus].name}). Put everything about it there. Create updates for other projects only if he clearly talks about them too.`:`Work out which project or projects he means from names, nicknames and context.`} Speech-to-text often mishears names: "after check" or "optha check" means Ophtha Check, "build cad" means BuildCAD, "W W T B A A" or "who wants to be an architect" means WWTBAA.
+
+Rules:
+- Change a field only when the update gives evidence for it. Leave every other field out.
+- maturity: M0..M7 or a range like "M2/M3". M0 Thought, M1 Concept, M2 Specification, M3 Prototype that can be demonstrated, M4 Working product people can use, M5 Live with real users, M6 Monetized (people pay), M7 Operating business. Raise it only when he describes reaching that stage. Never lower it unless he says so.
+- revenue: none | experimental | active | recurring. money: integer 1 to 6.
+- priority (P1, P2, P3, P4, PX) and decision (Build, Finish, Maintain, Delegate, Park, Kill): change only when he explicitly says so.
+- exists: the COMPLETE revised "what exists" text, keeping what was there and adding what he has now done.
+- remains: the COMPLETE revised "what remains" text, dropping what is now done and adding new gaps he mentions.
+- next: the single most concrete next action his update implies.
+- milestone: a short name for the milestone reached or now in progress.
+- state: a short current-state phrase, only if it has clearly changed.
+- character: the one-line current character (e.g. "Live + monetized", "Prototype"), only if it has clearly changed.
+- deadline: YYYY-MM-DD, only when he gives a date. deadlineNote: short context.
+- weekDone: true only when he says this week's outcome for a project in this week's five is finished.
+- milestones_done: exact titles of that project's milestones he says are now finished, one per line.
+- milestone_add: a new milestone he commits to, written as "title | YYYY-MM-DD" (date only if he gives or clearly implies one).
+- notes_append: facts worth keeping that fit no other field (figures, names, decisions, links).
+- Never rename a project. Respect locked decisions written in notes.
+- summary: one or two sentences in plain English, first person, as he would say it ("Finished the..."). Use hyphens, never em dashes.
+- why: for each changed field, a few words of evidence from his update or screenshots.
+- A project he describes that is not in the register goes in newProjects.
+
+Reply with only this JSON:
+{"updates":[{"projectId":"P39","summary":"...","changes":{"maturity":"M3","exists":"...","next":"..."},"why":{"maturity":"..."}}],"newProjects":[{"name":"...","category":"...","purpose":"..."}],"unclear":""}
+
+Register:
+${JSON.stringify(recs)}
+
+His update:
+"""
+${text}
+"""`;
+}
+function cleanProposal(r,focus){
+  const out={updates:[],newProjects:[],unclear:""};
+  if(!r||typeof r!=="object")return out;
+  const okVal={maturity:v=>/^M[0-7](\/M[0-7])?$/.test(v),revenue:v=>REVENUE.includes(v),money:v=>[1,2,3,4,5,6].includes(+v),priority:v=>PRIORITIES.includes(v),decision:v=>DECISIONS.includes(v),deadline:v=>/^\d{4}-\d{2}-\d{2}$/.test(v),weekDone:v=>String(v)==="true"};
+  (Array.isArray(r.updates)?r.updates:[]).forEach(u=>{
+    let id=String(u&&u.projectId||"").toUpperCase().trim();
+    if(!projects[id])id=focus||"";
+    if(!projects[id])return;
+    const ch={},why={};
+    Object.entries(u.changes||{}).forEach(([k,v])=>{
+      if(!UF[k]||v==null||v==="")return;
+      if(k==="milestones_done"&&Array.isArray(v))v=v.join("\n");
+      v=typeof v==="string"?v.replace(/\u2014/g,"-"):v;
+      if(okVal[k]&&!okVal[k](v))return;
+      if(k==="maturity"&&!MATS.includes(v))MATS.push(v);
+      if(!["notes_append","weekDone","milestones_done","milestone_add"].includes(k)&&String(projects[id][k]??"")===String(v))return;
+      if(k==="weekDone"&&!projects[id].week)return;
+      ch[k]=k==="weekDone"?"true":v;if(u.why&&u.why[k])why[k]=String(u.why[k]);
+    });
+    const ex=out.updates.find(x=>x.projectId===id);
+    const summary=String(u.summary||"").replace(/—/g,"-").trim()||"Progress update";
+    if(ex){Object.assign(ex.changes,ch);Object.assign(ex.why,why);ex.summary+=" "+summary}
+    else out.updates.push({projectId:id,summary,changes:ch,why});
+  });
+  out.newProjects=(Array.isArray(r.newProjects)?r.newProjects:[]).filter(n=>n&&n.name).map(n=>({name:String(n.name),category:String(n.category||""),purpose:String(n.purpose||"")}));
+  out.unclear=String(r.unclear||"").trim();
+  return out;
+}
+async function readUpdate(){
+  const text=($("#updText")?.value||"").trim();upd.text=text;upd.focus=$("#updProj").value;
+  if(!text&&!upd.files.length){upd.error="Say or paste something about the project first.";renderUpdate();return}
+  upd.error="";upd.stage="thinking";renderUpdate();
+  upd.ctl=new AbortController();
+  try{
+    const opts={signal:upd.ctl.signal,cache:false};
+    if(upd.files.length)opts.images=upd.files.map(f=>f.file);
+    const r=await sample.json(buildPrompt(text||"(No spoken update. Read the screenshots.)",upd.focus,upd.files.length),opts);
+    upd.proposal=cleanProposal(r,upd.focus);
+    if(!upd.proposal.updates.length&&!upd.proposal.newProjects.length){upd.stage="compose";upd.error="Claude couldn't match that to a project. Pick the project above and try again.";}
+    else upd.stage="review";
+  }catch(e){
+    upd.stage="compose";
+    const c=e&&e.code;
+    upd.error=c==="cancelled"?"":c==="no_key"?"Add your free Gemini key in Map → Voice update AI, then try again. Or save this as a note.":c==="bad_key"?"Google rejected the Gemini key. Check it in Map → Voice update AI.":c==="not_granted"||c==="sampling_disabled"?"Claude isn't allowed for this page, so the update can't be read automatically. Save it as a note instead.":c==="rate_limited"?"You've hit the free Gemini limit for now. Save it as a note and read it later.":c==="image_rejected"?"One of the screenshots couldn't be read. Remove it and try again.":c==="images_unavailable"?"Screenshots can't be sent from this view. Remove them and try again.":c==="invalid_json"?"The reply came back garbled. Tap Read my update to try again.":"Something went wrong reading the update. Try again.";
+    if(c==="not_granted"||c==="sampling_disabled")sample=null;
+  }
+  upd.ctl=null;renderUpdate();
+}
+async function uploadShots(){
+  const ids=[];
+  if(!assets||!upd.files.length)return ids;
+  for(const f of upd.files){try{const r=await assets.upload(f.file);ids.push(r.id)}catch(_){}}
+  return ids;
+}
+async function applyUpdates(){
+  const btn=$("#uApply");btn.disabled=true;btn.textContent="Saving…";
+  const shots=await uploadShots();let n=0;
+  for(let i=0;i<upd.proposal.updates.length;i++){
+    const u=upd.proposal.updates[i];const pid=$(`#u${i}_pid`).value;const old=projects[pid];if(!old)continue;
+    const p={...old};
+    Object.keys(u.changes).forEach(k=>{
+      const id=`u${i}_${k}`;if(!$(`#${id}_c`).checked)return;let v=$(`#${id}_v`).value;
+      if(k==="milestones_done"){const titles=v.split("\n").map(x=>x.trim().toLowerCase()).filter(Boolean);p.milestones=ms(old).map(m=>titles.some(t=>m.t.toLowerCase()===t||m.t.toLowerCase().includes(t)||t.includes(m.t.toLowerCase()))?{...m,done:true}:m);return}
+      if(k==="milestone_add"){const [t,d]=v.split("|").map(x=>x.trim());if(t)p.milestones=[...(p.milestones||ms(old)),{t,due:/^\d{4}-\d{2}-\d{2}$/.test(d||"")?d:"",done:false}];return}
+      if(k==="notes_append"){if(v.trim())p.notes=(old.notes?old.notes.trim()+"\n":"")+todayISO()+": "+v.trim();return}
+      if(k==="weekDone"){if(v==="true"&&p.week)p.weekDone=true;return}
+      if(k==="money")v=+v;
+      p[k]=v;
+    });
+    const summary=$(`#u${i}_sum`).value.trim()||u.summary;
+    p.log=[{d:todayISO(),t:new Date().toISOString(),summary:clip(summary,400),source:"voice",shots,raw:clip(upd.text,800)},...(old.log||[])].slice(0,40);
+    if(p.lastActivity!==todayISO())p.lastActivity=todayISO();
+    if(await commit(old,p,[{kind:"update",text:clip(summary,200)}]))n++;
+  }
+  closeUpdate();render();toast(n?`Saved ${n} update${n>1?"s":""}. The weekly review is updated.`:"Nothing was saved.");
+}
+async function saveNoteOnly(){
+  const text=($("#updText")?.value||"").trim();const pid=$("#updProj").value;
+  if(!pid){upd.text=text;upd.error="Pick the project this note belongs to.";renderUpdate();return}
+  if(!text&&!upd.files.length){upd.error="Write or dictate the note first.";renderUpdate();return}
+  const shots=await uploadShots();const old=projects[pid];
+  const p={...old,log:[{d:todayISO(),t:new Date().toISOString(),summary:clip(text||"Screenshots added",400),source:"note",shots},...(old.log||[])].slice(0,40),lastActivity:todayISO()};
+  if(await commit(old,p,[{kind:"update",text:clip(text||"Screenshots added",200)}])){closeUpdate();render();toast("Note saved to "+old.name)}
+}
+async function addFiles(fileList){
+  upd.text=$("#updText")?.value||upd.text;upd.focus=$("#updProj")?.value??upd.focus;upd.error="";
+  for(const f of fileList){
+    if(f.type.startsWith("image/")){
+      if(!imgLimits){upd.error="Screenshots can't be read in this view.";continue}
+      if(upd.files.length>=imgLimits.maxCount){upd.error=`Up to ${imgLimits.maxCount} screenshots per update.`;continue}
+      if(!imgLimits.mediaTypes.includes(f.type)){upd.error="Use JPEG, PNG, WebP or GIF screenshots.";continue}
+      upd.files.push({file:f,url:URL.createObjectURL(f)});
+    }else{
+      try{const t=await f.text();upd.text=(upd.text?upd.text+"\n\n":"")+`[From ${f.name}]\n`+t.slice(0,20000)}catch(_){upd.error="Couldn't read "+f.name}
+    }
+  }
+  renderUpdate();
+}
+
+const CONNECTIONS=[
+  [["P39","P41","P42","P11"],"→","Spider identifies strategic future possibilities, the postgraduate platform finds opportunities and supervisors, the Proposal Builder creates the documents, and the Execution Assistant keeps the user moving to completion."],
+  [["P12","P16","P17","P15","P18","P48"],"→","The museum is the platform, individual historical worlds become experiences, and Virtual Architecture provides the wider professional methodology."],
+  [["P31","P43","P22","P02","P01","P21"],"→","Competition creates attention, the game makes architecture entertaining, the community distributes, the academies teach, and the Fellowship deepens professional development."],
+  [["P09","P10"],"↔","Visual Lab is the application layer. The Motion Graphics Engine can become the generation layer underneath it."],
+  [["P35","P07","P47"],"→","The research framework gives intellectual foundations to practical AI tools for architectural design."],
+  [["P05","P06"],"↔","Nexus maps the professional ecosystem and Eagle Eye maps development. Together they form a wider built-environment intelligence platform."],
+  [["P02","P22","P25"],"↔","Community creates attention, education creates value, and the SUPERMARKET handles the transaction."],
+  [["P40","P39"],"↔","The book explains the philosophy and method. The software puts it to work."],
+];
+function connHTML(){return CONNECTIONS.map(([ids,arr,txt])=>`<div class="conn"><div class="chain">${ids.map(id=>projects[id]?`<button class="chip" data-open="${id}">${esc(projects[id].name)}</button>`:"").join(`<span class="arrow">${arr}</span>`)}</div><p>${esc(txt)}</p></div>`).join("")}
+function comboMapHTML(){
+  const L=list().filter(p=>p.priority!=="PX");const cnt=k=>L.filter(p=>p.domain===k).length;
+  const links=L.reduce((a,p)=>a+(p.helps||[]).length,0);
+  const folds=L.filter(p=>p.mergeInto&&projects[p.mergeInto]);
+  const verbs=["learn","work","heal","remember","imagine"];
+  return `<div class="panel combo"><small class="eyebrow">The combination</small><h2>Architecture, applied to everything</h2>
+    <p class="lede">BuildNET designs the structures Africans learn, work, heal, remember and imagine in, then makes them intelligent.</p>
+    <p class="sub">Each skill on its own is common: architect, Unreal world-builder, AI product builder, teacher of 900 students, storyteller. Holding all five, from Ibadan, with a body of work in each, is rare. That stack is the advantage. Its research name is Architectural Intelligence. BuildNET is the company that practises it.</p>
+    <div class="verbs">${verbs.map(v=>`<button class="verb dom-${v}" data-go="d_${v}"><b>${DOMAINS[v][0]}</b><span>${cnt(v)} projects</span><small>${esc(DOMAINS[v][1])}</small></button>`).join("")}<button class="verb dom-spine" data-go="d_spine"><b>Spine</b><span>${cnt("spine")} projects</span><small>${esc(DOMAINS.spine[1])}</small></button></div>
+    <h3 class="h3">The method every product follows</h3>
+    <ol class="method"><li><b>Start close to home.</b> A real problem in your own life or circle: your own health became The Sitting Disease, nursing colleagues close to home shaped Ophtha Check and the KPI system, your daughter's exam preparation proved BuildNET Academy, your PhD applications are shaping the Proposal Builder, and your fifty projects became this Control Centre.</li><li><b>Give it structure.</b> The architect's move: brief, plan, sequence, standards.</li><li><b>Make it visible or enterable.</b> A world, a story, a dashboard, an explainer.</li><li><b>Power it with AI.</b> Built in weeks, at low cost.</li><li><b>Teach it.</b> Every product produces lessons, content and people who can carry it further.</li></ol>
+    <h3 class="h3">The flywheel</h3>
+    <div class="wheel"><div class="spoke dom-imagine"><b>Stories and worlds</b>draw attention</div><span>→</span><div class="spoke dom-spine"><b>Gong, YouTube, podcast and Akede</b>carry it to people</div><span>→</span><div class="spoke dom-learn"><b>Community and education</b>turn attention into skill and income</div><span>→</span><div class="spoke dom-work"><b>Tools</b>serve the professionals education creates</div><span>→</span><div class="spoke dom-spine"><b>Revenue, data and research</b>sharpen the method</div><span class="loop">↺ back to new stories and worlds</span></div>
+    <p class="sub" style="margin-top:12px">${links} working links are mapped across the portfolio. Open any project to see who helps it and who it helps.</p>
+    <p class="note">Rule for every link: share audience, content, knowledge and brand freely. Shared databases, accounts or payment systems between products only happen when you approve that specific connection.</p>
+    ${folds.length?`<h3 class="h3">Suggested fold-ins</h3><div class="nlist">${folds.map(p=>`<div class="nitem warn"><button class="link" data-open="${esc(p.id)}"><b>${esc(p.name)} → ${esc(projects[p.mergeInto].name)}</b><small>${esc(p.mergeWhy||"")}</small></button></div>`).join("")}</div><p class="sub" style="margin-top:6px">Suggestions only. Nothing has been merged.</p>`:""}
+    ${L.filter(p=>p.domain==="unplaced").map(p=>`<p class="sub"><b>${esc(p.name)}</b> stays unplaced. ${esc(p.comboNote||"")}</p>`).join("")}
+  </div>`;
+}
+/* rules tab */
+function renderRules(){
+  $("#tab-rules").innerHTML=`${comboMapHTML()}<div class="panel"><h2>How the products connect</h2><p class="sub">The strongest long-term opportunity is the ecosystem, where audience, knowledge, technology, research, community and IP keep feeding one another. Tap a project to open it.</p>${connHTML()}</div>
+  <div class="panel"><h2>Maturity scale</h2><div class="tablewrap"><table class="ref"><tr><th>Level</th><th>Meaning</th><th>Interpretation</th></tr>
+    ${[["Mentioned or imagined; no meaningful definition yet."],["Problem, audience and proposition are defined."],["Features, workflow, business logic or creative structure substantially defined."],["A demonstrable technical or creative prototype exists."],["People can use it, even if not yet broadly released."],["Real users/customers are using it."],["People are paying for it."],["Recurring activity, customers, revenue or institutional operation exists."]].map((d,i)=>`<tr><td>M${i}</td><td>${MAT_NAMES[i]}</td><td>${d[0]}</td></tr>`).join("")}</table></div></div>
+  <div class="panel"><h2>Priority rules</h2><ol class="rules"><li>Protect products that already have paying customers.</li><li>Finish near-complete products before creating additional M1 concepts.</li><li>Use external deadlines to override ordinary priority where necessary.</li><li>Prefer projects that strengthen several other projects at once.</li><li>Give extra weight to short time-to-revenue and repeatable delivery.</li><li>Do not confuse intellectual excitement with execution priority.</li><li>Do not kill a project merely because it is old.</li><li>Do not build a new version of an existing capability if an existing project can absorb it.</li></ol></div>
+  <div class="panel"><h2>Locked decisions</h2><ul class="rules"><li>OPHTHA CHECK is the ophthalmology product name. Never "After Check".</li><li>Barki v0.1 has a locked 26-glyph A-Z mapping. Changes must be versioned.</li><li>Plinth is not part of the BuildNET business portfolio.</li><li>WWTBAA is a recurring operating programme.</li><li>BuildNET PPCE Academy is a live monetized product.</li><li>BuildNET Academy is a real product already used by a learner for examination preparation.</li><li>UCH Nurses KPI System is a monetized professional workflow product.</li></ul></div>
+  <div class="panel"><h2>Settings</h2><div class="fs"><div class="f"><label for="setForgot">Days before a project counts as forgotten</label><input id="setForgot" type="number" min="7" max="365" value="${settings.forgottenDays}"></div></div></div>
+  <div class="panel"><h2>Voice update AI</h2><p class="sub">A free Gemini key reads your dictated updates and screenshots. The key is kept only in this browser, so add it on each device you use.</p>
+    <div class="fs"><div class="f full"><label for="aiKey">Gemini API key</label><input id="aiKey" type="password" autocomplete="off" value="${esc(window.ccAI?window.ccAI.key():"")}" placeholder="Paste the key from aistudio.google.com"></div>
+    <div class="f full"><label for="aiModel">Model</label><select id="aiModel"><option value="${esc(window.ccAI?window.ccAI.model():"")}">${esc((window.ccAI&&window.ccAI.model())||"Pick automatically")}</option></select></div></div>
+    <div class="quick" style="margin-top:10px"><button class="btn" id="aiFind" type="button">Find my models</button><button class="btn primary" id="aiSave" type="button">Save key</button></div><p class="sub" id="aiMsg" style="margin-top:8px"></p></div>
+  <div class="panel"><h2>Account and data</h2><p class="sub">Signed in as <b>${esc(window.ccAccount?window.ccAccount.email():"")}</b>. Download a backup now and then; it holds every project, log and review.</p>
+    <div class="quick"><button class="btn" id="dataExport" type="button">Download backup</button><label class="filebtn">Import a backup<input id="dataImport" type="file" accept=".json,application/json"></label><button class="btn" id="signOut" type="button">Sign out</button></div><p class="sub" id="dataMsg" style="margin-top:8px"></p></div>`;
+}
+
+/* export */
+async function exportCsv(){
+  const cols=["id","name","engine","category","whatItIs","supposedTo","nearFuture","longTerm","character","maturity","money","priority","decision","revenue","state","purpose","exists","remains","next","routes","milestone","deadline","lastActivity","week","weekOutcome","notes"];
+  const rows=[cols.concat("score").join(",")].concat(Object.values(projects).sort((a,b)=>a.id.localeCompare(b.id)).map(p=>cols.map(c=>`"${String(p[c]??"").replace(/"/g,'""')}"`).concat(score(p).total).join(",")));
+  try{await downloads.save({filename:"control-centre-register-"+todayISO()+".csv",data:rows.join("\n")});}catch(e){if(e&&e.code!=="cancelled"&&e.code!=="declined")toast("Export did not complete.")}
+}
+
+/* events */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.view){view=t.dataset.view;renderRail();renderGrid();return}
+  if(t.dataset.go){view=t.dataset.go;setTab("register");render();return}
+  if(t.dataset.tabgo){setTab(t.dataset.tabgo);return}
+  if(t.dataset.tab){setTab(t.dataset.tab);return}
+  if(t.id==="aiFind"){const k=$("#aiKey").value.trim();const m=$("#aiMsg");if(!k){m.textContent="Paste your key first.";return}m.textContent="Asking Google which models your key can use…";window.ccAI.listModels(k).then(list=>{$("#aiModel").innerHTML=list.map((n,i)=>`<option value="${esc(n)}"${i===0?" selected":""}>${esc(n)}${i===0?" (recommended)":""}</option>`).join("");m.textContent=list.length?`${list.length} models found. The first is picked for you.`:"No suitable models found for this key."}).catch(e=>{m.textContent=e.message||"That key didn't work."});return}
+  if(t.id==="aiSave"){window.ccAI.save($("#aiKey").value.trim(),$("#aiModel").value);$("#aiMsg").textContent=$("#aiKey").value.trim()?"Saved on this device. Voice updates will now be read automatically.":"Key removed from this device.";return}
+  if(t.id==="dataExport"){window.ccData.exportAll().then(d=>downloads?downloads.save({filename:"control-centre-backup-"+todayISO()+".json",data:JSON.stringify(d,null,1)}):0).catch(()=>toast("Backup failed. Try again."));return}
+  if(t.id==="dataImportGo"){const n=pendingImport;if(!n)return;t.disabled=true;$("#dataMsg").textContent="Importing…";window.ccData.importAll(n).then(c=>{$("#dataMsg").textContent=`Imported ${c} records. Reloading…`;setTimeout(()=>location.reload(),900)}).catch(e=>{$("#dataMsg").textContent=e.message||"Import failed.";t.disabled=false});return}
+  if(t.id==="signOut"){window.ccAccount.signOut();return}
+  if(t.dataset.help){scheduleHelp(t.dataset.help);return}
+  if(t.dataset.msdone){markMsDone(t.dataset.msdone);return}
+  if(t.dataset.jump){document.getElementById(t.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
+  if(t.dataset.rmpri){rmPri=t.dataset.rmpri;renderRoadmap();return}
+  if(t.dataset.rmdone){rmDone=!rmDone;renderRoadmap();return}
+  if(t.dataset.mx){const cur=readMs();cur.splice(+t.dataset.mx,1);$("#msEd").innerHTML=msEditor(cur);return}
+  if(t.id==="fab"){openUpdate("");return}
+  if(t.id==="uClose"){closeUpdate();return}
+  if(t.id==="uRead"){readUpdate();return}
+  if(t.id==="uStop"){upd.ctl&&upd.ctl.abort();return}
+  if(t.id==="uBack"){upd.stage="compose";renderUpdate();return}
+  if(t.id==="uApply"){applyUpdates();return}
+  if(t.id==="uNote"){saveNoteOnly();return}
+  if(t.dataset.rmshot){const i=+t.dataset.rmshot;upd.text=$("#updText").value;URL.revokeObjectURL(upd.files[i].url);upd.files.splice(i,1);renderUpdate();return}
+  if(t.dataset.newproj){const n=upd.proposal.newProjects[+t.dataset.newproj];closeUpdate();const ids=Object.keys(projects).map(k=>parseInt(k.slice(1),10)).filter(x=>!isNaN(x));const nn=Math.max(settings.nextId||51,...ids.map(x=>x+1));openDrawer("P"+String(nn).padStart(2,"0"),true,{name:n.name,category:n.category,purpose:n.purpose});return}
+  if(t.dataset.open&&projects[t.dataset.open]){openDrawer(t.dataset.open,false);return}
+  if(t.dataset.week){setWeek(t.dataset.week,true);return}
+  if(t.dataset.unweek){setWeek(t.dataset.unweek,false);return}
+  if(t.id==="wkPrev")shiftWeek(-1);else if(t.id==="wkNext")shiftWeek(1);else if(t.id==="wkNow"){reviewWeek=weekId(new Date());subscribeReview()}
+});
+document.addEventListener("input",e=>{
+  if(e.target.dataset.wo)onWeekOutcome(e.target.dataset.wo,e.target.value);
+  if(e.target.id==="rvNotes")onNotes(e.target.value);
+});
+let pendingImport=null;
+document.addEventListener("change",async e=>{
+  if(e.target.id==="dataImport"){const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.format!=="control-centre-export")throw 0;pendingImport=j;const m=$("#dataMsg");m.innerHTML=`${j.docs.length} records in ${esc(f.name)}. Matching records will be replaced. <button class="btn primary" id="dataImportGo" type="button">Import now</button>`}catch(_){$("#dataMsg").textContent="That file isn't a Control Centre backup."}return}
+  if(e.target.id==="updFiles"){addFiles([...e.target.files]);return}
+  if(e.target.id&&/^u\d+_.+_c$/.test(e.target.id)){e.target.closest(".chg").classList.toggle("off",!e.target.checked);return}
+  if(e.target.dataset&&e.target.dataset.done){setDone(e.target.dataset.done,e.target.checked);return}
+  if(e.target.id==="setForgot"){const n=Math.max(7,Math.min(365,parseInt(e.target.value,10)||30));settings={...settings,forgottenDays:n};render();if(db){try{await db.doc("meta/settings").set(settings);toast("Saved")}catch(_){toast("Could not save the setting.")}}}
+});
+$("#q").addEventListener("input",renderGrid);
+$("#sort").addEventListener("change",renderGrid);
+$("#addBtn").onclick=()=>{const ids=Object.keys(projects).map(k=>parseInt(k.slice(1),10)).filter(n=>!isNaN(n));const n=Math.max(settings.nextId||51,...ids.map(i=>i+1),1);openDrawer("P"+String(n).padStart(2,"0"),true)};
+$("#exportBtn").onclick=exportCsv;
+$("#dClose").onclick=closeDrawer;$("#dCancel").onclick=closeDrawer;$("#scrim").onclick=closeDrawer;
+$("#dSave").onclick=save;$("#dDelete").onclick=archive;
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#updRoot").hidden)closeUpdate();else if(!$("#drawerRoot").hidden)closeDrawer()});
+$("#updScrim").onclick=closeUpdate;
+document.addEventListener("paste",e=>{if($("#updRoot").hidden||upd.stage!=="compose")return;const imgs=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith("image/"));if(imgs.length){e.preventDefault();addFiles(imgs)}});
+function setTab(k){tab=k;document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===k));["focus","register","roadmap","review","rules"].forEach(x=>$("#tab-"+x).hidden=x!==k);
+  if(k==="focus")renderFocus();if(k==="roadmap")renderRoadmap();if(k==="review")subscribeReview();if(k==="rules")renderRules();window.scrollTo(0,0)}
+const h=(location.hash||"").slice(1);if(["register","roadmap","review","rules"].includes(h))setTab(h);
+
+render();
+
+/* data */
+(async()=>{
+  if(!window.claude||!window.claude.use){loaded=true;showStatus("Sign in to load your saved projects.");render();return}
+  db=await window.claude.use("db");
+  const user=await window.claude.use("user");
+  downloads=await window.claude.use("downloads");
+  window.claude.use("sample").then(async sm=>{sample=sm;if(sm){try{const l=await sm.limits();imgLimits=l&&l.images||null}catch(_){imgLimits=null}}if(!$("#updRoot").hidden&&upd.stage==="compose")renderUpdate()});
+  window.claude.use("assets").then(a=>{assets=a});
+  if(downloads)$("#exportBtn").hidden=false;
+  if(!db){loaded=true;showStatus("Sign in to claude.ai to load and edit the register.");render();return}
+  if(user){try{const c=await user.can("data.write");if(c===false){canWrite=false;$("#addBtn").hidden=true;showStatus("View-only: you can browse the register but not change it.")}}catch(_){}}
+  const wk=weekId(new Date());let gotSettings=false,gotProjects=false,rolled=false;
+  const maybeRoll=async()=>{
+    if(rolled||!gotSettings||!gotProjects)return;rolled=true;
+    if(settings.weekOf===wk)return;
+    // new week: finished outcomes leave the five, unfinished ones carry over
+    if(settings.weekOf){for(const p of list().filter(x=>x.week&&x.weekDone)){const q={...p,week:false,weekDone:false,weekOutcome:""};try{await db.doc("projects/"+p.id).set(q);projects[p.id]=q}catch(_){}}}
+    settings={...settings,weekOf:wk};try{await db.doc("meta/settings").set(settings)}catch(_){}
+    render();
+  };
+  db.doc("meta/settings").onSnapshot(s=>{if(s.exists)settings={forgottenDays:30,nextId:51,...s.data()};gotSettings=true;maybeRoll();render()},()=>{gotSettings=true});
+  db.doc("activity/"+wk).onSnapshot(s=>{if(s.metadata.hasPendingWrites)return;activity[wk]=s.exists?(s.data().events||[]):[];render()},()=>{});
+  db.doc("reviews/"+wk).get().then(r=>{storedReview[wk]=r.exists?{...r.data()}:{};scheduleGen()}).catch(()=>{});
+  db.collection("projects").onSnapshot(snap=>{
+    const next={};snap.docs.forEach(d=>{if(d.exists)next[d.id]={...d.data(),id:d.id}});
+    projects=next;loaded=true;gotProjects=true;maybeRoll();render();scheduleGen();
+  },err=>{loaded=true;showStatus(err&&err.code==="revoked"?"Access to this register changed. Reload to continue.":"Could not load the register. Reload the page to try again.");render()});
+})();
+function showStatus(m){const s=$("#status");s.textContent=m;s.hidden=false}
+})();
+</script>
+
+</body>
+</html>
