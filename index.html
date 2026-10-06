@@ -262,6 +262,46 @@ button.link:hover{color:var(--indigo)}
 .spoke b{display:block;font:600 14px var(--f-display);color:var(--dc)}
 .wheel>span{color:var(--muted);font-family:var(--f-mono)}
 .wheel .loop{flex-basis:100%;font-size:13px}
+.tabs{overflow-x:auto;scrollbar-width:none}
+.drawer.narrow{width:min(100%,460px)}
+.wpipe{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:13px}
+.wpipe span{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.wpipe i{font-style:normal;color:var(--muted)}
+.board{display:flex;flex-direction:column;gap:8px}
+.chrow{display:grid;grid-template-columns:minmax(0,1.4fr) auto auto auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.chname{min-width:0}.chname b{display:block;font:600 15px var(--f-display)}.chname small{display:block;color:var(--muted);font-size:12px}
+.dots{display:flex;gap:4px}
+.dot{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:600 10px var(--f-mono);border:1.5px solid var(--line);color:var(--muted)}
+.dot.off{border-color:transparent;opacity:.45}
+.dot.done{background:var(--good);border-color:var(--good);color:var(--surface)}
+.dot.miss{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.dot.today{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.dot.up{border-color:var(--indigo);color:var(--indigo)}
+.chstat{text-align:right}.chstat b{display:block;font:700 18px var(--f-display);font-variant-numeric:tabular-nums}.chstat small{color:var(--muted);font-size:12px;white-space:nowrap}
+@media (max-width:640px){.chrow{grid-template-columns:1fr auto}.chrow .dots{grid-column:1/-1;order:3}.chrow .btn{grid-column:2;grid-row:1}.chstat{grid-column:1;text-align:left;order:4}}
+.wrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:10px 12px}
+.wrow:hover{border-color:var(--muted)}
+.wid{font:600 11px var(--f-mono);color:var(--muted)}
+.wmain{min-width:0}.wmain b{display:block;font-weight:600;overflow-wrap:anywhere}.wmain small{display:block;color:var(--muted);font-size:12px}
+.wst{font:600 10px var(--f-mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.wst.st-published,.wst.st-series{background:var(--good-soft);color:var(--good)}
+.wst.st-draft,.wst.st-rework{background:var(--warn-soft);color:var(--warn)}
+.wst.st-idea{background:var(--indigo-soft);color:var(--indigo)}
+.wst.st-canon{background:var(--laterite);color:var(--surface)}
+.wst[class*="-seed"]{background:var(--laterite-soft);color:var(--laterite)}
+.wtype{font:700 12px var(--f-display);width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--line)}
+@media (max-width:560px){.wrow{grid-template-columns:1fr auto}.wrow .wid,.wrow .wtype{display:none}}
+.assets{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:8px}
+.asset{display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--bg)}
+.asset button.link b{display:block;font-weight:600}.asset button.link small{display:block;color:var(--muted);font-size:12px}
+.nitem>span b{display:block;font-weight:600}.nitem>span small{display:block;color:var(--muted);font-size:13px}
+.chedit{border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--bg)}
+.daypick,.checks{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px;font-size:14px}
+.daypick label,.checks label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+.daypick input,.checks input{width:17px;height:17px;accent-color:var(--indigo)}
+.postrow{display:grid;grid-template-columns:1fr 150px 1fr auto;gap:6px;margin-bottom:6px}
+.postrow select,.postrow input{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;min-width:0;width:100%}
+@media (max-width:560px){.postrow{grid-template-columns:1fr 1fr auto}.postrow input[id^="wp_u_"]{grid-column:1/3}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:60}
 .rules li{margin-bottom:6px;max-width:70ch}
 @media (max-width:560px){.brand h1{font-size:19px}.tabs{width:100%}.tabs button{flex:1;padding:7px 2px;font-size:13px}.fs{grid-template-columns:1fr}.stat b{font-size:22px}}
@@ -292,6 +332,7 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
       <button role="tab" data-tab="focus" aria-selected="true">Focus</button>
       <button role="tab" data-tab="register" aria-selected="false">Register</button>
       <button role="tab" data-tab="roadmap" aria-selected="false">Roadmap</button>
+      <button role="tab" data-tab="writing" aria-selected="false">Writing</button>
       <button role="tab" data-tab="review" aria-selected="false">Review</button>
       <button role="tab" data-tab="rules" aria-selected="false">Map</button>
     </nav>
@@ -322,6 +363,7 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
   </section>
 
   <section id="tab-roadmap" hidden></section>
+  <section id="tab-writing" hidden></section>
   <section id="tab-review" hidden></section>
   <section id="tab-rules" hidden></section>
 </main>
@@ -343,6 +385,8 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
     <div class="dfoot" id="uFoot"></div>
   </aside>
 </div>
+<div id="wRoot" hidden><div class="scrim" id="wScrim"></div><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="wTitle"><div class="dhead"><span class="pid" id="wId"></span><h2 id="wTitle"></h2><button class="btn" id="wClose">Close</button></div><div class="dbody" id="wBody"></div><div class="dfoot"><button class="btn" id="wDelete">Delete</button><span class="grow"></span><button class="btn" id="wCancel">Cancel</button><button class="btn primary" id="wSave">Save</button></div></aside></div>
+<div id="lRoot" hidden><div class="scrim" id="lScrim"></div><aside class="drawer narrow" role="dialog" aria-modal="true" aria-labelledby="lTitle"><div class="dhead"><h2 id="lTitle">Log a post</h2><button class="btn" id="lClose">Close</button></div><div class="dbody" id="lBody"></div><div class="dfoot"><span class="grow"></span><button class="btn primary" id="lSave">Save post</button></div></aside></div>
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
@@ -350,7 +394,7 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
 <script src="cc-runtime.js"></script>
 <script>
 (function(){
-const ENGINES={professional:"Professional Technology",education:"Education",heritage:"Digital Heritage & Virtual Worlds",creative:"Media, Creative & Entertainment IP",intelligence:"Intelligence & Research",programmes:"Community, Distribution & Events"};
+const ENGINES={writing:"Writing & Intellectual Output",professional:"Professional Technology",education:"Education",heritage:"Digital Heritage & Virtual Worlds",creative:"Media, Creative & Entertainment IP",intelligence:"Intelligence & Research",programmes:"Community, Distribution & Events"};
 const DOMAINS={learn:["Learn","Education, community and events that grow people"],work:["Work","Tools and services for built-environment professionals"],heal:["Heal","Health products for professionals and patients"],remember:["Remember","Heritage worlds that keep African history visitable"],imagine:["Imagine","Stories, media and visual IP"],spine:["Spine","The method, the voice, the distribution and the execution system under everything"],unplaced:["Unplaced","No honest connection yet"]};
 const DECISIONS=["Build","Finish","Maintain","Delegate","Park","Kill"];
 const PRIORITIES=["P1","P2","P3","P4","PX"];
@@ -413,6 +457,7 @@ const VIEWS=[
   ["heritage","Heritage worlds",p=>p.engine==="heritage"],
   ["education","Education",p=>p.engine==="education"],
   ["research","Research",p=>!!p.research||/research|academic|phd/i.test(p.category||"")],
+  ["writing","Writing",p=>p.engine==="writing"],
   ["d_learn","Learn",p=>p.domain==="learn"],["d_work","Work",p=>p.domain==="work"],["d_heal","Heal",p=>p.domain==="heal"],["d_remember","Remember",p=>p.domain==="remember"],["d_imagine","Imagine",p=>p.domain==="imagine"],["d_spine","Spine",p=>p.domain==="spine"],
   ["professional","Pro products",p=>p.engine==="professional"],
   ["intelligence","Intelligence",p=>p.engine==="intelligence"],
@@ -478,7 +523,7 @@ function renderGrid(){
     <div class="tags">${cardTags(p)}<span class="score" title="Decision score">${score(p).total}</span></div>
   </button>`).join("");
 }
-function render(){renderStats();renderRail();renderGrid();if(tab==="focus"&&!(document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.wo))renderFocus();if(tab==="roadmap")renderRoadmap();if(tab==="review"&&document.activeElement?.id!=="rvNotes")renderReview();}
+function render(){renderStats();renderRail();renderGrid();if(tab==="focus"&&!(document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.wo))renderFocus();if(tab==="roadmap")renderRoadmap();if(tab==="writing"&&!wActiveInput())renderWriting();if(tab==="review"&&document.activeElement?.id!=="rvNotes")renderReview();}
 
 /* drawer */
 function field(id,label,val,type="text",opts,cls=""){
@@ -690,6 +735,7 @@ function generateReview(wk){
     else if(e.kind==="update")q2.push(it(e.id,`${e.name}: ${e.text}`,"good"));
     else if(e.kind==="created")q2.push(it(e.id,`${e.name} entered the register at ${e.to}`));
   });
+  {const m0=mondayOfWeekId(wk),s0=addDays(m0,6);wlist().forEach(w=>{const ps=(w.posts||[]).filter(p=>p.d>=m0&&p.d<=s0);if(ps.length)q2.push(it(w.id,`Published "${w.title}" on ${[...new Set(ps.map(p=>chName(p.ch)))].join(", ")}`,"good"))})}
   A.push(q2.length?q2:[it(null,"No progress recorded yet this week. Mark outcomes done, raise a maturity level or update a next action as work happens.","warn")]);
   // 3 forgotten
   const q3=L.filter(isForgotten).sort((a,b)=>score(b).total-score(a).total).slice(0,5).map(p=>{const d=daysSince(p.lastActivity);return it(p.id,`${p.name} (${p.priority}, score ${score(p).total}) - ${d===Infinity?"no activity ever logged":d+" days untouched"}`,p.priority==="P1"?"bad":"warn")});
@@ -778,6 +824,8 @@ function headline(S){
   if(t.length){const x=t[0];return [`${name(x)}: ${dueText(x.m.due)}.`,`"${x.m.t}". ${t.length>1?`${t.length-1} more milestone${t.length>2?"s":""} land in the next three days.`:"Clear this before starting anything new."}`]}
   const money=S.att.find(a=>a.tone==="bad");
   if(money)return [`${money.p.name} pays you. Give it some time this week.`,`${money.why}. Protecting live revenue comes before new builds.`];
+  const wn=wmeta?writingNudges():[];const wt=wn.find(n=>n.tone==="warn")||wn.find(n=>n.tone==="bad");
+  if(wt)return [`${wt.title}.`,wt.sub||"Post it, then tap Log post."];
   if(S.soon.length){const x=S.soon[0];return [`On track. Next up: ${name(x)}, ${dueText(x.m.due)}.`,`"${x.m.t}". ${S.soon.length} milestone${S.soon.length>1?"s":""} fall in the next two weeks.`]}
   return ["Nothing urgent. Good week to move a build forward.","Pick from the candidates below, or finish a milestone early."];
 }
@@ -806,7 +854,7 @@ function helpPanel(){
 }
 function renderFocus(){
   const el=$("#tab-focus");
-  if(!loaded||!list().length){el.innerHTML=`<div class="hero"><small>Focus</small><h2>${loaded?"The register is empty":"Loading your portfolio"}</h2><p>${loaded?(db?"Import the data file from the Claude version to bring in all your projects, or add projects in the Register tab.":"Sign in to load your projects."):"One moment."}</p>${loaded&&db?`<div class="quick" style="margin-top:12px"><label class="filebtn">Import data file<input id="dataImport" type="file" accept=".json,application/json"></label></div><p class="sub" id="dataMsg" style="margin-top:8px"></p>`:""}</div>`;return}
+  if(!loaded||!list().length){el.innerHTML=`<div class="hero"><small>Focus</small><h2>${loaded?"The register is empty":"Loading your portfolio"}</h2><p>${loaded?(db?"Add projects in the Register tab.":"Sign in to load your projects."):"One moment."}</p>${loaded&&db&&window.ccData?`<div class="quick" style="margin-top:12px"><label class="filebtn">Import data file<input id="dataImport" type="file" accept=".json,application/json"></label></div><p class="sub" id="dataMsg" style="margin-top:8px"></p>`:""}</div>`;return}
   const S=signals(),[h,sub]=headline(S),hr=new Date().getHours();
   const greet=hr<12?"Good morning":hr<17?"Good afternoon":"Good evening";
   const doneBtn=(x)=>`<button class="btn" data-msdone="${esc(x.p.id)}|${x.i}">Done</button>`;
@@ -816,10 +864,12 @@ function renderFocus(){
       <button class="${S.overdue.length?"bad":"good"}" data-go="overdue"><b>${S.overdue.length}</b><span>Overdue milestones</span></button>
       <button class="${S.soon.length?"warn":""}" data-go="soon"><b>${S.soon.length}</b><span>Due in 14 days</span></button>
       <button class="${attU.length?"warn":"good"}" data-jump="att"><b>${attU.length}</b><span>Need attention</span></button>
+      ${wmeta&&channels().length?(()=>{const tt=weekPostTotals(mondayOf(todayISO()));return `<button class="${tt.done>=tt.expected&&tt.expected?"good":writingNudges().some(n=>n.tone==="bad")?"bad":""}" data-tabgo="writing"><b>${tt.done}/${tt.expected}</b><span>Posts this week</span></button>`})():""}
       <button class="${S.wkDone===S.wkN&&S.wkN?"good":""}" data-jump="five"><b>${S.wkDone}/${S.wkN||5}</b><span>Week's outcomes done</span></button>
     </div></div>
   ${S.overdue.length?`<div class="panel"><h2>Overdue</h2><p class="sub">Finish these first, or change the date so the timeline stays honest.</p><div class="nlist">${S.overdue.slice(0,8).map(x=>nitem(x.p,x.m.t,`${x.p.name} · ${x.p.priority} · ${dueText(x.m.due)}`,"bad",doneBtn(x))).join("")}</div>${S.overdue.length>8?`<p class="sub" style="margin-top:8px">${S.overdue.length-8} more in the Roadmap.</p>`:""}</div>`:""}
   <div class="panel"><h2>Due in the next two weeks</h2>${S.soon.length?`<div class="nlist">${S.soon.map(x=>nitem(x.p,x.m.t,`${x.p.name} · ${x.p.priority} · ${dueText(x.m.due)}`,x.d<=3?"warn":"info",doneBtn(x))).join("")}</div>`:`<p class="sub">Nothing due in the next 14 days.</p>`}</div>
+  ${focusWritingHTML()}
   <div id="five">${weekHTML()}</div>
   ${helpPanel()}
   <div class="panel" id="att"><h2>Needs attention</h2><p class="sub">Money that's being neglected, P1s going quiet, and projects without a dated next step.</p>${attU.length?`<div class="nlist">${attU.slice(0,10).map(a=>nitem(a.p,a.p.name,a.why,a.tone,"")).join("")}</div>${attU.length>10?`<p class="sub" style="margin-top:8px">${attU.length-10} more. Open the Register's Forgotten view.</p>`:""}`:`<p class="sub">Nothing flagged.</p>`}
@@ -864,7 +914,7 @@ let woTimer={};
 function onWeekOutcome(id,val){clearTimeout(woTimer[id]);woTimer[id]=setTimeout(async()=>{if(!db||projects[id].weekOutcome===val)return;await commit(projects[id],{...projects[id],weekOutcome:val})},900)}
 
 /* review tab */
-const KIND_LABEL={created:"Added",archived:"Archived",restored:"Restored",maturity_up:"Maturity up",maturity_down:"Maturity down",revenue:"Revenue",money:"Money score",priority:"Priority",decision:"Decision",milestone:"Milestone",next_changed:"Next action",deadline:"Deadline",week_in:"Into the five",week_out:"Out of the five",outcome_done:"Outcome done",outcome_reopened:"Outcome reopened",outcome_set:"Outcome set",details:"Details",logged:"Work logged",update:"Update",milestone_done:"Milestone done",milestone_added:"Milestone added",milestone_moved:"Milestone moved"};
+const KIND_LABEL={created:"Added",archived:"Archived",restored:"Restored",maturity_up:"Maturity up",maturity_down:"Maturity down",revenue:"Revenue",money:"Money score",priority:"Priority",decision:"Decision",milestone:"Milestone",next_changed:"Next action",deadline:"Deadline",week_in:"Into the five",week_out:"Out of the five",outcome_done:"Outcome done",outcome_reopened:"Outcome reopened",outcome_set:"Outcome set",details:"Details",logged:"Work logged",update:"Update",w_idea:"New idea",w_published:"Posted",w_status:"Writing",milestone_done:"Milestone done",milestone_added:"Milestone added",milestone_moved:"Milestone moved"};
 function eventText(e){
   switch(e.kind){
     case "maturity_up":case "maturity_down":return `${e.from} → ${e.to}`;
@@ -877,6 +927,8 @@ function eventText(e){
     case "details":return "edited "+(e.fields||[]).join(", ");
     case "created":return "at "+e.to;
     case "update":return e.text||"";
+    case "w_published":return "on "+(e.text||"");
+    case "w_idea":case "w_status":return e.text||"";
     case "milestone_done":return e.text||"";
     case "milestone_added":return `${e.text}${e.to?" · "+e.to:""}`;
     case "milestone_moved":return `${e.text} · ${e.from||"no date"} → ${e.to||"no date"}`;
@@ -896,7 +948,7 @@ function renderReview(){
   el.innerHTML=`<div class="panel"><div class="weekpick"><button class="btn" id="wkPrev" aria-label="Previous week">‹</button><b style="font-family:var(--f-mono)">${esc(reviewWeek)}</b><button class="btn" id="wkNext" aria-label="Next week"${isCur?" disabled":""}>›</button>${isCur?"":`<button class="btn" id="wkNow">This week</button>`}</div>
     <h2>Weekly review</h2>
     <p class="sub">${isCur?"Written automatically from what you do in the app, and updated with every change.":"The review as it stood at the end of that week."} ${g?`<b>${g.events}</b> recorded change${g.events===1?"":"s"} across <b>${g.projects}</b> project${g.projects===1?"":"s"}.`:""}${stale?" Rebuilt from that week's log against today's register.":""}</p>
-    ${g?`<div class="qa">${g.answers.map((items,i)=>`<section class="qblock"><h3>${i+1}. ${esc(Qs[i])}</h3><ul>${items.map(x=>`<li class="${esc(x.tone)}">${x.id?`<button class="link" data-open="${esc(x.id)}">${esc(x.text)}</button>`:esc(x.text)}</li>`).join("")}</ul></section>`).join("")}</div>`:`<div class="empty"><h2>No record for this week</h2>The log started on 5 October 2026. Weeks before that have no activity to review.</div>`}
+    ${writingReviewHTML(reviewWeek)}${g?`<div class="qa">${g.answers.map((items,i)=>`<section class="qblock"><h3>${i+1}. ${esc(Qs[i])}</h3><ul>${items.map(x=>`<li class="${esc(x.tone)}">${x.id?`<button class="link" data-open="${esc(x.id)}">${esc(x.text)}</button>`:esc(x.text)}</li>`).join("")}</ul></section>`).join("")}</div>`:`<div class="empty"><h2>No record for this week</h2>The log started on 5 October 2026. Weeks before that have no activity to review.</div>`}
   </div>
   <div class="panel"><h2>Your notes</h2><p class="sub">Optional. Anything the app could not see, such as a client call or an offline payment.</p>
     <div class="f"><label for="rvNotes">Notes for ${esc(reviewWeek)}</label><textarea id="rvNotes" rows="3">${esc(notes)}</textarea></div></div>
@@ -1139,6 +1191,296 @@ function comboMapHTML(){
     ${L.filter(p=>p.domain==="unplaced").map(p=>`<p class="sub"><b>${esc(p.name)}</b> stays unplaced. ${esc(p.comboNote||"")}</p>`).join("")}
   </div>`;
 }
+/* ---------- writing & intellectual output ---------- */
+let writing={}, wmeta=null, wsub="week", wfilter={status:"",series:"",ch:"",q:"",asset:""}, wEditing=null, wDraftPosts=[], wCtl=null;
+const W_STATUS=["IDEA","DRAFT","PUBLISHED","SERIES","ARCHIVE","REWORK","RESEARCH SEED","BOOK SEED","PRODUCT SEED","CANON"];
+const W_TYPES={A:"Commentary",B:"Teaching",C:"Intellectual argument",D:"Seed",E:"Canon"};
+const W_TYPE_DESC={A:"A response to something happening now.",B:"A lesson for architects or students.",C:"A new way of thinking about architecture, technology, society or culture.",D:"An early idea that may become a book, product, research project or programme.",E:"A piece that sets down a principle of the Prof Newrock universe."};
+const W_VALUES=["Audience","Intellectual","Educational","Research","Product","Cultural"];
+const W_THEMES=["Phenomenology","Architectural experience","Architecture students","Architectural education","Professional practice","Nigerian architecture","Philosophy","AI","Technology","Health","Culture & heritage","Future & society","Creativity","Entrepreneurship","Human behaviour"];
+const W_PLAT={linkedin:"LinkedIn",newsletter:"LinkedIn newsletter",substack:"Substack",whatsapp:"WhatsApp",other:"Other"};
+const DOWS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DEFAULT_VOICE=`- Start from something ordinary (a motorcycle, a worn path across a lawn, a chair, a staircase, a left-handed student, a door) and use it to expose a larger architectural or philosophical question.
+- Reflective, intellectually curious, culturally grounded in Nigerian and African life, fond of analogies.
+- Stories and concrete specifics before abstractions. Take a clear position when the evidence supports one.
+- Vary sentence length aggressively. Mix short lines with longer, flowing ones.
+- Plain, accessible language, so students can join a professional conversation.
+- Use short hyphens (-), never em dashes.
+- Avoid "not X, but Y" contrasts and "because this, then that" constructions.
+- Avoid filler transitions ("It is important to note", "In conclusion", "Furthermore"), heavy hedging and shallow lists.
+- Avoid the words "room" and "dangerous".
+- No invented facts, no fake typos or deliberate errors.`;
+const DEFAULT_CHANNELS=[
+  {id:"club",name:"WhatsApp · The Club",platform:"whatsapp",days:[1],every:1,anchor:"",active:true,purpose:"Monday: test the week's observation with students and ask for their own experience."},
+  {id:"li",name:"LinkedIn",platform:"linkedin",days:[3,6],every:1,anchor:"",active:true,purpose:"Wednesday: the observation and its question. Saturday: the argument, sharpened by what the Club said."},
+  {id:"elite",name:"WhatsApp · Elite Core",platform:"whatsapp",days:[4],every:1,anchor:"",active:true,purpose:"Thursday: a deeper mentoring note for the inner group."},
+  {id:"ls",name:"Line & Space",platform:"newsletter",days:[5],every:2,anchor:"2026-10-16",active:true,purpose:"Fortnightly chapter on Friday."},
+  {id:"ss",name:"Substack · Stories That Build",platform:"substack",days:[0],every:2,anchor:"2026-10-11",active:true,purpose:"Fortnightly long-form essay on Sunday, alternating with Line & Space."},
+  {id:"nia",name:"WhatsApp · NIA and professional groups",platform:"whatsapp",days:[2],every:2,anchor:"2026-10-13",active:true,purpose:"Fortnightly professional commentary that moves the conversation."}
+];
+const W_ASSETS=[
+  ["The Phenomenology of Architecture","P54",w=>w.series==="The Phenomenology of Architecture"],
+  ["LinkedIn Architecture Thought Leadership","P55",w=>postedTo(w,"li")],
+  ["Stories That Build","P28",w=>postedTo(w,"ss")],
+  ["Line & Space","P29",w=>postedTo(w,"ls")||w.relatedProject==="P29"],
+  ["WhatsApp / The Club Teaching Corpus","P56",w=>postedTo(w,"club")||postedTo(w,"elite")],
+  ["Architecture Student Writing","P57",w=>["Architecture students","Architectural education"].includes(w.theme)],
+  ["NIA / Professional Architecture Commentary","P58",w=>postedTo(w,"nia")||["Professional practice","Nigerian architecture"].includes(w.theme)],
+  ["Who Killed Architecture","P59",w=>w.series==="Who Killed Architecture"],
+  ["Architectural Philosophy & Essays","P60",w=>["Philosophy","Architectural experience"].includes(w.theme)],
+  ["AI + Architecture Writing","P61",w=>["AI","Technology"].includes(w.theme)],
+  ["Architecture + Health Writing","P62",w=>w.theme==="Health"],
+  ["Architecture + Culture / Heritage Writing","P63",w=>w.theme==="Culture & heritage"],
+  ["Future / Technology / Society Writing","P64",w=>w.theme==="Future & society"],
+  ["Writing Seeds for Books",null,w=>isSeed(w,"book")],
+  ["Writing Seeds for Research",null,w=>isSeed(w,"research")],
+  ["Writing Seeds for Products",null,w=>isSeed(w,"product")]
+];
+function postedTo(w,ch){return (w.posts||[]).some(p=>p.ch===ch)}
+function isSeed(w,k){return w.status===k.toUpperCase()+" SEED"||(w.seedFor||[]).includes(k)}
+function wlist(){return Object.values(writing)}
+function isoD(d){return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+function mondayOf(iso){const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()-((d.getDay()+6)%7));return isoD(d)}
+function mondayOfWeekId(wk){const [y,w]=wk.split("-W").map(Number);const d=new Date(Date.UTC(y,0,4));d.setUTCDate(d.getUTCDate()-((d.getUTCDay()||7)-1)+(w-1)*7);return d.toISOString().slice(0,10)}
+function channels(all){const c=(wmeta&&Array.isArray(wmeta.channels))?wmeta.channels:[];return all?c:c.filter(x=>x.active!==false)}
+function chName(id){const c=channels(true).find(x=>x.id===id);return c?c.name:id}
+function onWeek(c,mon){if(Number(c.every||1)!==2)return true;const a=mondayOf(c.anchor||mon);const diff=Math.round((new Date(mon+"T12:00:00")-new Date(a+"T12:00:00"))/864e5/7);return ((diff%2)+2)%2===0}
+function slotDates(c,mon){const since=(wmeta&&wmeta.since)||"0000-00-00";if(!onWeek(c,mon))return [];return (c.days||[]).map(dw=>addDays(mon,(Number(dw)+6)%7)).filter(d=>d>=since).sort()}
+function postsIn(ch,from,to){const out=[];wlist().forEach(w=>(w.posts||[]).forEach(p=>{if(p.ch===ch&&p.d>=from&&p.d<=to)out.push({w,p})}));return out}
+function chWeek(c,mon){const slots=slotDates(c,mon),posts=postsIn(c.id,mon,addDays(mon,6)),t=todayISO();const past=slots.filter(d=>d<t).length,upto=slots.filter(d=>d<=t).length;return {slots,posts,done:posts.length,expected:slots.length,behind:Math.max(0,past-posts.length),todayDue:slots.includes(t)&&posts.length<upto}}
+function chStreak(c){const since=(wmeta&&wmeta.since)||"0000-00-00";let n=0,mon=addDays(mondayOf(todayISO()),-7);for(let i=0;i<60;i++){if(addDays(mon,6)<since)break;const s=slotDates(c,mon);if(s.length){if(postsIn(c.id,mon,addDays(mon,6)).length>=s.length)n++;else break}mon=addDays(mon,-7)}return n}
+function nextSlot(c){const t=todayISO();let mon=mondayOf(t);for(let i=0;i<4;i++){const s=slotDates(c,mon).filter(d=>d>t);if(s.length)return s[0];mon=addDays(mon,7)}return null}
+function weekPostTotals(mon){let d=0,e=0;channels().forEach(c=>{const s=chWeek(c,mon);d+=Math.min(s.done,s.expected);e+=s.expected});return {done:d,expected:e}}
+function dayLabel(d){const n=daysUntil(d);return n===0?"today":n===1?"tomorrow":new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"long"})+(n>6?" "+fmtDate(d):"")}
+function writingNudges(){const mon=mondayOf(todayISO()),out=[];channels().forEach(c=>{const s=chWeek(c,mon);
+  if(s.todayDue)out.push({ch:c.id,tone:"warn",title:`${c.name}: post due today`,sub:c.purpose||""});
+  else if(s.behind>0)out.push({ch:c.id,tone:"bad",title:`${c.name}: ${s.behind} post${s.behind>1?"s":""} behind this week`,sub:`${s.done} of ${s.expected} done. Post now, or log what you already posted.`});});return out}
+function readyDrafts(){const t=todayISO();return wlist().filter(w=>["DRAFT","REWORK"].includes(w.status)||(w.status==="IDEA"&&w.date&&w.date<=addDays(t,3))).sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"))}
+function wActiveInput(){const a=document.activeElement;return !!(a&&a.closest&&a.closest("#tab-writing")&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))}
+function seriesList(){return [...new Set(wlist().map(w=>w.series).filter(Boolean))].sort()}
+
+function focusWritingHTML(){
+  if(!wmeta||!channels().length)return "";
+  const mon=mondayOf(todayISO()),tot=weekPostTotals(mon),nud=writingNudges();
+  const ups=channels().map(c=>({c,d:nextSlot(c)})).filter(x=>x.d).sort((a,b)=>a.d.localeCompare(b.d)).slice(0,3);
+  const dr=readyDrafts().slice(0,3);
+  return `<div class="panel" id="wnow"><h2>Write and post</h2><p class="sub">${tot.done} of ${tot.expected} scheduled posts done this week. One idea can travel the whole week: the Club first, then LinkedIn, then the long essay.</p>
+  ${nud.length?`<div class="nlist">${nud.map(n=>`<div class="nitem ${n.tone}"><button class="link" data-wsubgo="week"><b>${esc(n.title)}</b><small>${esc(n.sub)}</small></button><button class="btn" data-wlog="${esc(n.ch)}">Log post</button></div>`).join("")}</div>`:`<p class="sub" style="margin:0">Nothing due right now.${ups.length?` Next: ${ups.map(x=>`${esc(x.c.name)} ${esc(dayLabel(x.d))}`).join("; ")}.`:""}</p>`}
+  ${dr.length?`<h3 class="h3">Ready to post</h3><div class="nlist">${dr.map(w=>`<div class="nitem info"><button class="link" data-wopen="${esc(w.id)}"><b>${esc(w.title)}</b><small>${esc(w.status)}${w.date?" · for "+esc(fmtDate(w.date)):""}${w.series?" · "+esc(w.series):""}</small></button><button class="btn" data-wlogp="${esc(w.id)}">Posted</button></div>`).join("")}</div>`:""}
+  <div class="quick" style="margin-top:10px"><button class="btn" data-tabgo="writing">Open writing</button><button class="btn" data-wcap="1">Capture an idea</button></div></div>`;
+}
+
+function renderWriting(){
+  const el=$("#tab-writing");
+  if(!loaded){el.innerHTML=`<div class="hero"><h2>Loading your writing</h2></div>`;return}
+  const subs=[["week","This week"],["ideas","Ideas & queue"],["register","Register"],["assets","Core assets"],["schedule","Schedule & voice"]];
+  el.innerHTML=`<div class="panel combo"><small class="eyebrow">Writing & Intellectual Output</small><h2>The intellectual engine</h2>
+    <p class="lede">Take something ordinary and use it to expose a larger architectural question.</p>
+    <p class="sub">An idea starts as a Club observation, becomes a LinkedIn discussion, grows into a Substack essay, then a research argument, a book, a product or a lecture. This is where that writing gets planned, posted and kept.</p>
+    <div class="wpipe">${["Observation","WhatsApp","LinkedIn","Substack","Collection","Research question","Paper","Book, method or product"].map(s=>`<span>${s}</span>`).join("<i>→</i>")}</div>
+    <div class="rmfilters" style="margin:14px 0 0">${subs.map(([k,l])=>`<button class="chip" aria-pressed="${wsub===k}" data-wsub="${k}">${l}</button>`).join("")}</div></div>
+  ${wsub==="week"?wWeekHTML():wsub==="ideas"?wIdeasHTML():wsub==="register"?wRegisterHTML():wsub==="assets"?wAssetsHTML():wScheduleHTML()}`;
+}
+function wWeekHTML(){
+  const t=todayISO(),mon=mondayOf(t),chs=channels();
+  if(!chs.length)return `<div class="panel"><h2>No posting schedule yet</h2><p class="sub">Start with the starter rhythm and adjust it in Schedule & voice.</p><button class="btn primary" id="wStarter">Use the starter schedule</button></div>`;
+  const tot=weekPostTotals(mon),days=[0,1,2,3,4,5,6].map(i=>addDays(mon,i));
+  const ps=[];wlist().forEach(w=>(w.posts||[]).forEach(p=>{if(p.d>=mon&&p.d<=addDays(mon,6))ps.push({w,p})}));ps.sort((a,b)=>b.p.d.localeCompare(a.p.d));
+  return `<div class="panel"><h2>This week's posting</h2><p class="sub">Week of ${esc(fmtDate(mon))}. ${tot.done} of ${tot.expected} scheduled posts done.</p>
+  <div class="board">${chs.map(c=>{const s=chWeek(c,mon),st=chStreak(c);
+    const dots=days.map(d=>{const dl=new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"narrow"});if(!s.slots.includes(d))return `<span class="dot off" title="${esc(fmtDate(d))}">${dl}</span>`;const done=s.slots.indexOf(d)<s.done;const cls=done?"done":d<t?"miss":d===t?"today":"up";return `<span class="dot ${cls}" title="${esc(fmtDate(d))}${done?" · posted":d<t?" · missed":d===t?" · due today":""}">${dl}</span>`}).join("");
+    return `<div class="chrow"><div class="chname"><b>${esc(c.name)}</b><small>${esc(c.purpose||"")}</small></div><div class="dots" aria-label="Posting days">${dots}</div><div class="chstat"><b>${s.expected?s.done+"/"+s.expected:s.done}</b><small>${s.expected?"":onWeek(c,mon)?"nothing scheduled · ":"off-week · "}${st?st+"-week streak":"no streak yet"}</small></div><button class="btn" data-wlog="${esc(c.id)}">Log post</button></div>`}).join("")}</div></div>
+  <div class="panel"><h2>Posted this week</h2>${ps.length?`<div class="nlist">${ps.map(({w,p})=>`<div class="nitem good"><button class="link" data-wopen="${esc(w.id)}"><b>${esc(w.title)}</b><small>${esc(chName(p.ch))} · ${esc(fmtDate(p.d))}</small></button>${p.url?`<a class="btn" href="${esc(p.url)}" target="_blank" rel="noopener">View</a>`:""}</div>`).join("")}</div>`:`<p class="sub">Nothing logged yet this week. Tap Log post after you publish.</p>`}</div>`;
+}
+function wRow(w){const chs=[...new Set((w.posts||[]).map(p=>chName(p.ch)))];return `<button class="wrow" data-wopen="${esc(w.id)}"><span class="wid">${esc(w.id)}</span><span class="wmain"><b>${esc(w.title||"Untitled")}</b><small>${[w.series,w.theme,chs.join(", "),w.date?fmtDate(w.date):""].filter(Boolean).map(esc).join(" · ")}</small></span><span class="wst st-${esc((w.status||"").replace(/ /g,"-").toLowerCase())}">${esc(w.status)}</span>${w.type?`<span class="wtype" title="${esc(W_TYPES[w.type]||"")}">${esc(w.type)}</span>`:""}</button>`}
+function wIdeasHTML(){
+  const q=wlist().filter(w=>["IDEA","DRAFT","REWORK"].includes(w.status)).sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999")||a.id.localeCompare(b.id));
+  return `<div class="panel" id="wcap"><h2>Capture an idea</h2><p class="sub">Tap the microphone on your keyboard and say it. Two answers are enough.</p>
+  <div class="fs"><div class="f full"><label for="cap_obs">What ordinary thing did you notice?</label><textarea id="cap_obs" rows="2" placeholder="Students carrying their stools from one studio to another…"></textarea></div>
+  <div class="f full"><label for="cap_q">What larger question does it expose?</label><textarea id="cap_q" rows="2" placeholder="Who is the studio really designed for?"></textarea></div>
+  <div class="f"><label for="cap_title">Working title (optional)</label><input id="cap_title"></div>
+  <div class="f"><label for="cap_theme">Theme</label><select id="cap_theme">${W_THEMES.map(x=>`<option>${esc(x)}</option>`).join("")}</select></div>
+  <div class="f"><label for="cap_series">Series (optional)</label><input id="cap_series" list="seriesList"></div>
+  <div class="f"><label for="cap_date">Aim to post by</label><input id="cap_date" type="date"></div></div>
+  <datalist id="seriesList">${seriesList().map(s=>`<option value="${esc(s)}">`).join("")}</datalist>
+  <div class="quick" style="margin-top:10px"><button class="btn" id="capSave">Save idea</button>${sample?`<button class="btn primary" id="capDraft">Save and draft it in my voice</button>`:""}</div><p class="sub" id="capMsg" style="margin-top:8px"></p></div>
+  <div class="panel"><h2>Queue</h2><p class="sub">Ideas and drafts waiting to go out, soonest first.</p>${q.length?`<div class="nlist">${q.map(wRow).join("")}</div>`:`<p class="sub">Empty. Capture an idea above.</p>`}</div>`;
+}
+function wRegisterHTML(){
+  let L=wlist();const f=wfilter;
+  if(f.asset!==""){const a=W_ASSETS[+f.asset];if(a)L=L.filter(a[2])}
+  if(f.status)L=L.filter(w=>w.status===f.status);if(f.series)L=L.filter(w=>w.series===f.series);if(f.ch)L=L.filter(w=>postedTo(w,f.ch));
+  if(f.q){const q=f.q.toLowerCase();L=L.filter(w=>[w.id,w.title,w.obs,w.question,w.argument,w.series,w.theme,w.engagement,w.futureUse].join(" ").toLowerCase().includes(q))}
+  L.sort((a,b)=>b.id.localeCompare(a.id));
+  return `<div class="panel"><h2>Writing register</h2><p class="sub">Every piece, with what it argues and what it could become.${f.asset!==""&&W_ASSETS[+f.asset]?` Showing <b>${esc(W_ASSETS[+f.asset][0])}</b>. <button class="link" data-wclear="1">Show all</button>`:""}</p>
+  <div class="tools"><input id="wq" type="search" placeholder="Search writing" aria-label="Search writing" value="${esc(f.q)}"><select id="wfs" aria-label="Status"><option value="">All statuses</option>${W_STATUS.map(s=>`<option${f.status===s?" selected":""}>${s}</option>`).join("")}</select><select id="wfser" aria-label="Series"><option value="">All series</option>${seriesList().map(s=>`<option${f.series===s?" selected":""}>${esc(s)}</option>`).join("")}</select><select id="wfch" aria-label="Channel"><option value="">All channels</option>${channels(true).map(c=>`<option value="${esc(c.id)}"${f.ch===c.id?" selected":""}>${esc(c.name)}</option>`).join("")}</select><button class="btn primary" id="wNew">New piece</button></div>
+  ${L.length?`<div class="nlist">${L.map(wRow).join("")}</div>`:`<p class="sub">Nothing matches.</p>`}</div>`;
+}
+function wAssetsHTML(){
+  return `<div class="panel"><h2>Core assets</h2><p class="sub">Sixteen bodies of work. A piece counts for what it could become as well as how far it travels: audience, intellectual, educational, research, product and cultural value. Tap one to see its pieces.</p>
+  <div class="assets">${W_ASSETS.map(([name,pid,fn],i)=>{const n=wlist().filter(fn).length,p=pid&&projects[pid],m=p&&nextMs(p);return `<div class="asset"><button class="link" data-wasset="${i}"><b>${esc(name)}</b><small>${n} piece${n===1?"":"s"}${m?` · next: ${esc(m.t)} (${esc(dueText(m.due))})`:""}</small></button>${p?`<button class="btn" data-open="${esc(pid)}">Project</button>`:""}</div>`}).join("")}</div></div>
+  <div class="panel"><h2>Five kinds of writing</h2><div class="nlist">${Object.entries(W_TYPES).map(([k,v])=>`<div class="nitem info"><span><b>${k}. ${esc(v)}</b><small>${esc(W_TYPE_DESC[k])}</small></span><span class="tag">${wlist().filter(w=>w.type===k).length}</span></div>`).join("")}</div></div>`;
+}
+function chEditRow(c,i){
+  return `<div class="chedit" data-chi="${i}"><div class="fs"><div class="f"><label for="chn_${i}">Channel</label><input id="chn_${i}" value="${esc(c.name)}"></div><div class="f"><label for="chp_${i}">Platform</label><select id="chp_${i}">${Object.entries(W_PLAT).map(([k,v])=>`<option value="${k}"${c.platform===k?" selected":""}>${v}</option>`).join("")}</select></div><div class="f full"><label for="chu_${i}">What it's for</label><input id="chu_${i}" value="${esc(c.purpose||"")}"></div></div>
+  <div class="daypick">${[1,2,3,4,5,6,0].map(d=>`<label><input type="checkbox" id="chd_${i}_${d}"${(c.days||[]).map(Number).includes(d)?" checked":""}> ${DOWS[d]}</label>`).join("")}</div>
+  <div class="fs" style="margin-top:8px"><div class="f"><label for="che_${i}">How often</label><select id="che_${i}"><option value="1"${Number(c.every||1)===1?" selected":""}>Every week</option><option value="2"${Number(c.every)===2?" selected":""}>Every other week</option></select></div><div class="f"><label for="cha_${i}">First date (every other week)</label><input id="cha_${i}" type="date" value="${esc(c.anchor||"")}"></div></div>
+  <div class="quick" style="margin-top:8px"><label class="tick"><input type="checkbox" id="chx_${i}"${c.active!==false?" checked":""}> Active</label><button class="btn" data-chrm="${i}" type="button">Remove</button></div><input type="hidden" id="chid_${i}" value="${esc(c.id)}"></div>`;
+}
+function readChannels(){return [...document.querySelectorAll("#chEd .chedit")].map(r=>{const i=r.dataset.chi;return {id:$("#chid_"+i).value||("ch"+Math.random().toString(36).slice(2,7)),name:$("#chn_"+i).value.trim()||"Untitled channel",platform:$("#chp_"+i).value,purpose:$("#chu_"+i).value.trim(),days:[0,1,2,3,4,5,6].filter(d=>$(`#chd_${i}_${d}`).checked),every:+$("#che_"+i).value,anchor:$("#cha_"+i).value,active:$("#chx_"+i).checked}})}
+function wScheduleHTML(){
+  const chs=channels(true);
+  return `<div class="panel"><h2>Posting schedule</h2><p class="sub">Pick the days each channel gets a post. Every-other-week channels count from their first date. Nudges count from ${esc(fmtDate((wmeta&&wmeta.since)||todayISO()))}.</p>
+  <div id="chEd">${(chs.length?chs:[]).map(chEditRow).join("")}</div>
+  <div class="quick" style="margin-top:10px"><button class="btn" id="chAdd" type="button">Add channel</button>${chs.length?"":`<button class="btn" id="wStarter" type="button">Use the starter schedule</button>`}</div></div>
+  <div class="panel"><h2>Your voice</h2><p class="sub">The rules used whenever a draft is written in your voice. Edit them as your style moves.</p><div class="f"><label for="wVoice">Voice rules</label><textarea id="wVoice" rows="12">${esc((wmeta&&wmeta.voice)||DEFAULT_VOICE)}</textarea></div>
+  <div class="quick" style="margin-top:10px"><button class="btn primary" id="schedSave" type="button">Save schedule and voice</button></div><p class="sub" id="schedMsg" style="margin-top:8px"></p></div>`;
+}
+async function saveWmeta(next,msg){if(!db){toast("Sign in to save changes.");return false}try{await db.doc("meta/writing").set(next);wmeta=next;if(msg)toast(msg);return true}catch(e){toast("Could not save. Check your connection and try again.");return false}}
+
+/* piece editor */
+function blankPiece(id){return {id,title:"",status:"IDEA",type:"C",series:"",theme:"Phenomenology",audience:"",obs:"",question:"",argument:"",date:"",posts:[],relatedProject:"",relatedBook:"",relatedResearch:"",relatedProduct:"",seedFor:[],values:[],engagement:"",futureUse:"",source:"",next:"",drafts:{},created:todayISO()}}
+function nextWid(){const ids=Object.keys(writing).map(k=>parseInt(k.slice(1),10)).filter(n=>!isNaN(n));const n=Math.max((wmeta&&wmeta.nextW)||1,...ids.map(x=>x+1),1);return "W"+String(n).padStart(3,"0")}
+function postsEditor(){if(!wDraftPosts.length)return `<p class="sub" style="margin:0">Not posted anywhere yet.</p>`;return wDraftPosts.map((p,i)=>`<div class="postrow"><select id="wp_ch_${i}" aria-label="Channel">${channels(true).map(c=>`<option value="${esc(c.id)}"${p.ch===c.id?" selected":""}>${esc(c.name)}</option>`).join("")}</select><input id="wp_d_${i}" type="date" aria-label="Date" value="${esc(p.d||"")}"><input id="wp_u_${i}" aria-label="Link" placeholder="Link (optional)" value="${esc(p.url||"")}"><button type="button" class="msx" data-wpostrm="${i}" aria-label="Remove post">×</button></div>`).join("")}
+function readPostsRaw(){return wDraftPosts.map((_,i)=>({ch:($("#wp_ch_"+i)||{}).value||"",d:($("#wp_d_"+i)||{}).value||"",url:(($("#wp_u_"+i)||{}).value||"").trim()}))}
+function openPiece(id){
+  const isNew=!id||!writing[id];const w=isNew?blankPiece(nextWid()):JSON.parse(JSON.stringify(writing[id]));
+  wEditing={id:w.id,isNew};wDraftPosts=(w.posts||[]).slice();
+  $("#wId").textContent=w.id;$("#wTitle").textContent=isNew?"New piece":(w.title||"Untitled");
+  const projOpts=`<option value="">None</option>`+list().filter(p=>p.priority!=="PX").sort((a,b)=>a.id.localeCompare(b.id)).map(p=>`<option value="${esc(p.id)}"${w.relatedProject===p.id?" selected":""}>${esc(p.id)} · ${esc(p.name)}</option>`).join("");
+  const dl={whatsapp:"WhatsApp",linkedin:"LinkedIn",substack:"Substack outline"};
+  $("#wBody").innerHTML=`<div class="fs">${field("w_title","Title or working title",w.title,"text",null,"full")}${field("w_status","Status",w.status,"select",W_STATUS)}${field("w_type","Type",w.type,"select",Object.entries(W_TYPES).map(([k,v])=>[k,k+" · "+v]))}
+    <div class="f"><label for="w_series">Series</label><input id="w_series" list="seriesList2" value="${esc(w.series)}"><datalist id="seriesList2">${seriesList().map(s=>`<option value="${esc(s)}">`).join("")}</datalist></div>
+    ${field("w_theme","Theme",w.theme,"select",W_THEMES)}${field("w_audience","Audience",w.audience)}${field("w_date","Planned or first published date",w.date,"date")}</div>
+  <h3 class="sect">The idea</h3><div class="fs">${field("w_obs","The ordinary thing",w.obs,"textarea",null,"full")}${field("w_question","Key question",w.question,"textarea",null,"full")}${field("w_argument","Core argument",w.argument,"textarea",null,"full")}</div>
+  <h3 class="sect">Where it went</h3><div id="wPosts">${postsEditor()}</div><div><button class="btn" type="button" id="wPostAdd">Add a post</button></div>
+  ${field("w_engagement","Engagement and response",w.engagement,"textarea",null,"full")}
+  <h3 class="sect">Drafts</h3>${sample?`<div><button class="btn" type="button" id="wDraft">Draft it in my voice</button></div><p class="sub" id="wDraftMsg" style="margin:0"></p>`:""}
+  <div class="fs">${["whatsapp","linkedin","substack"].map(k=>`<div class="f full"><label for="wd_${k}">${dl[k]}</label><textarea id="wd_${k}" rows="${k==="whatsapp"?4:8}">${esc((w.drafts||{})[k]||"")}</textarea><div><button class="btn" type="button" data-wcopy="wd_${k}">Copy</button></div></div>`).join("")}</div>
+  <h3 class="sect">What it could become</h3><div class="fs"><div class="f full"><label for="w_rel">Related project</label><select id="w_rel">${projOpts}</select></div>${field("w_book","Related book",w.relatedBook)}${field("w_research","Related research",w.relatedResearch)}${field("w_product","Related product",w.relatedProduct)}
+    <div class="f full"><span class="cl2">Seed for</span><div class="checks">${["book","research","product"].map(k=>`<label><input type="checkbox" id="ws_${k}"${(w.seedFor||[]).includes(k)?" checked":""}> ${k[0].toUpperCase()+k.slice(1)}</label>`).join("")}</div></div>
+    <div class="f full"><span class="cl2">Value</span><div class="checks">${W_VALUES.map(v=>`<label><input type="checkbox" id="wv_${v}"${(w.values||[]).includes(v)?" checked":""}> ${v}</label>`).join("")}</div></div>
+    ${field("w_future","Potential future use",w.futureUse,"textarea",null,"full")}${field("w_source","Source file or URL",w.source,"text",null,"full")}${field("w_next","Next action",w.next,"text",null,"full")}</div>`;
+  $("#wDelete").hidden=isNew;$("#wRoot").hidden=false;document.body.style.overflow="hidden";
+}
+function closePiece(){if(wCtl)wCtl.abort();$("#wRoot").hidden=true;document.body.style.overflow="";wEditing=null}
+function collectPiece(){
+  const g=k=>($("#"+k)||{}).value||"";const base=wEditing.isNew?blankPiece(wEditing.id):{...writing[wEditing.id]};
+  Object.assign(base,{title:g("w_title").trim(),status:g("w_status"),type:g("w_type"),series:g("w_series").trim(),theme:g("w_theme"),audience:g("w_audience"),date:g("w_date"),obs:g("w_obs"),question:g("w_question"),argument:g("w_argument"),engagement:g("w_engagement"),relatedProject:g("w_rel"),relatedBook:g("w_book"),relatedResearch:g("w_research"),relatedProduct:g("w_product"),
+    seedFor:["book","research","product"].filter(k=>$("#ws_"+k)&&$("#ws_"+k).checked),values:W_VALUES.filter(v=>$("#wv_"+v)&&$("#wv_"+v).checked),futureUse:g("w_future"),source:g("w_source"),next:g("w_next"),
+    posts:readPostsRaw().filter(p=>p.ch&&p.d),drafts:{whatsapp:g("wd_whatsapp"),linkedin:g("wd_linkedin"),substack:g("wd_substack")},updatedAt:todayISO()});
+  if(base.posts.length&&["IDEA","DRAFT","REWORK"].includes(base.status))base.status="PUBLISHED";
+  return base;
+}
+async function writePiece(old,w){
+  if(!db){toast("Sign in to save changes.");return false}
+  try{await db.doc("writing/"+w.id).set(w);writing[w.id]=w}catch(e){toast("Could not save. Check your connection and try again.");return false}
+  const t=new Date().toISOString(),ev=[],nm=clip(w.title,80),oldPosts=(old&&old.posts)||[];
+  if(!old)ev.push({t,id:w.id,name:nm,kind:"w_idea",text:w.series||w.theme||""});
+  (w.posts||[]).filter(p=>!oldPosts.some(o=>o.ch===p.ch&&o.d===p.d)).forEach(p=>ev.push({t,id:w.id,name:nm,kind:"w_published",text:chName(p.ch)}));
+  if(old&&old.status!==w.status&&w.status!=="PUBLISHED")ev.push({t,id:w.id,name:nm,kind:"w_status",text:`${old.status} → ${w.status}`});
+  if(ev.length)logEvents(ev);
+  const n=parseInt(w.id.slice(1),10)+1;
+  if(!old&&n>((wmeta&&wmeta.nextW)||0)){const m={...(wmeta||{}),nextW:n};try{await db.doc("meta/writing").set(m);wmeta=m}catch(_){}}
+  if(w.relatedProject&&projects[w.relatedProject]&&ev.some(e=>e.kind==="w_published")){const p=projects[w.relatedProject];if(p.lastActivity!==todayISO()){const q={...p,lastActivity:todayISO()};try{await db.doc("projects/"+p.id).set(q);projects[p.id]=q}catch(_){}}}
+  return true;
+}
+async function savePiece(){
+  if(!wEditing)return;const w=collectPiece();
+  if(!w.title&&!w.obs){toast("Give it a title or the ordinary thing you noticed.");$("#w_title").focus();return}
+  if(!w.title)w.title=clip(w.obs,70);
+  const old=wEditing.isNew?null:writing[w.id];$("#wSave").disabled=true;
+  try{if(await writePiece(old,w)){closePiece();render();toast("Saved "+w.id)}}finally{$("#wSave").disabled=false}
+}
+async function deletePiece(){
+  if(!wEditing||wEditing.isNew)return;const b=$("#wDelete");
+  if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Tap again to delete";setTimeout(()=>{b.dataset.armed="";b.textContent="Delete"},3000);return}
+  b.dataset.armed="";b.textContent="Delete";const id=wEditing.id;
+  try{await db.doc("writing/"+id).delete();delete writing[id];closePiece();render();toast("Deleted "+id)}catch(e){toast("Could not delete.")}
+}
+async function captureIdea(draft){
+  const obs=$("#cap_obs").value.trim(),q=$("#cap_q").value.trim();
+  if(!obs&&!q){$("#capMsg").textContent="Say what you noticed first.";return}
+  const w=blankPiece(nextWid());Object.assign(w,{obs,question:q,title:$("#cap_title").value.trim()||clip(obs||q,70),theme:$("#cap_theme").value,series:$("#cap_series").value.trim(),date:$("#cap_date").value,type:"D"});
+  if(await writePiece(null,w)){toast("Idea saved as "+w.id);render();if(draft){openPiece(w.id);draftVoice()}}
+}
+function voicePrompt(w){
+  const voice=(wmeta&&wmeta.voice)||DEFAULT_VOICE;
+  return `You are drafting social posts and an essay outline for Prof Newrock (Arc. Ajibola Oladiran), an architect, VR world-builder and teacher of architecture students in Ibadan, Nigeria. He will edit and post them himself, so they must sound like him.
+
+His voice rules:
+${voice}
+
+The idea:
+Title: ${w.title||"(none)"}
+The ordinary thing he noticed: ${w.obs||"(none)"}
+The larger question: ${w.question||"(none)"}
+Core argument: ${w.argument||"(none yet)"}
+Series: ${w.series||"(none)"}
+Theme: ${w.theme||""}
+Audience: ${w.audience||"architects, architecture students and curious professionals"}
+${w.engagement?"What people said when he shared it: "+w.engagement:""}
+
+Write:
+1. "whatsapp": a post for The Club, his WhatsApp community of architecture students. 60 to 120 words, conversational, ending with one question that asks students for their own experience.
+2. "linkedin": a LinkedIn post of 180 to 300 words. Open with the ordinary thing, move to the larger architectural question, take a clear position, end with a question for architects. Short paragraphs. At most three hashtags, at the very end.
+3. "substack": an outline for a long-form essay: a working title, then 5 to 7 section headings each with one line on what that section argues, then a closing line.
+4. "keyQuestion": the key question in one sentence.
+
+Do not invent facts, statistics, names or quotations. Use hyphens, never em dashes.
+Reply with only JSON: {"whatsapp":"...","linkedin":"...","substack":"...","keyQuestion":"..."}`;
+}
+async function draftVoice(){
+  if(!sample||!wEditing)return;const w=collectPiece(),msg=$("#wDraftMsg"),btn=$("#wDraft");
+  if(btn)btn.disabled=true;if(msg)msg.innerHTML=`<span class="dots"><i></i><i></i><i></i></span> Drafting in your voice. This can take up to a minute.`;
+  wCtl=new AbortController();
+  try{
+    const r=await sample.json(voicePrompt(w),{signal:wCtl.signal,cache:false});const fix=s=>String(s||"").replace(/[—–]/g,"-").trim();
+    ["whatsapp","linkedin","substack"].forEach(k=>{const el=$("#wd_"+k);if(el&&r&&r[k])el.value=fix(r[k])});
+    if(r&&r.keyQuestion&&$("#w_question")&&!$("#w_question").value.trim())$("#w_question").value=fix(r.keyQuestion);
+    if($("#w_status")&&$("#w_status").value==="IDEA")$("#w_status").value="DRAFT";
+    if(msg)msg.textContent="Drafts ready. Edit them until they sound exactly like you, then Save.";
+  }catch(e){const c=e&&e.code;if(msg)msg.textContent=c==="cancelled"?"":c==="no_key"?"Add your free Gemini key in Map → Voice update AI first.":c==="bad_key"?"The Gemini key was rejected. Check it in Map → Voice update AI.":c==="not_granted"||c==="sampling_disabled"?"Drafting isn't allowed for this page.":c==="rate_limited"?"You've hit the AI usage limit for now. Try again later.":"Drafting failed. Try again."}
+  finally{if(btn)btn.disabled=false;wCtl=null}
+}
+/* log a post */
+function openLog(ch,pieceId){
+  const chs=channels(true);if(!chs.length){toast("Set up your posting schedule first.");return}
+  const open=wlist().filter(w=>["IDEA","DRAFT","REWORK"].includes(w.status)).sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
+  const recent=wlist().filter(w=>!["IDEA","DRAFT","REWORK"].includes(w.status)).sort((a,b)=>b.id.localeCompare(a.id)).slice(0,20);
+  const pc=pieceId&&writing[pieceId]?pieceId:"";const defCh=ch||(pc&&((writing[pc].posts||[])[0]||{}).ch)||chs[0].id;
+  $("#lBody").innerHTML=`<div class="fs"><div class="f full"><label for="l_ch">Channel</label><select id="l_ch">${chs.map(c=>`<option value="${esc(c.id)}"${c.id===defCh?" selected":""}>${esc(c.name)}</option>`).join("")}</select></div>
+  ${field("l_d","Date posted",todayISO(),"date",null,"full")}
+  <div class="f full"><label for="l_piece">What did you post?</label><select id="l_piece"><option value="">A new piece (type the title below)</option>${open.length?`<optgroup label="Ideas and drafts">${open.map(w=>`<option value="${esc(w.id)}"${w.id===pc?" selected":""}>${esc(w.id)} · ${esc(clip(w.title,60))}</option>`).join("")}</optgroup>`:""}${recent.length?`<optgroup label="Already published">${recent.map(w=>`<option value="${esc(w.id)}"${w.id===pc?" selected":""}>${esc(w.id)} · ${esc(clip(w.title,60))}</option>`).join("")}</optgroup>`:""}</select></div>
+  ${field("l_title","Title, if it's new","","text",null,"full")}${field("l_url","Link (optional)","","text",null,"full")}</div>
+  <p class="sub" style="margin:0">Cross-posting the same idea? Pick the published piece and the new channel.</p>`;
+  $("#lRoot").hidden=false;document.body.style.overflow="hidden";
+}
+function closeLog(){$("#lRoot").hidden=true;document.body.style.overflow=""}
+async function saveLog(){
+  const ch=$("#l_ch").value,d=$("#l_d").value||todayISO(),pid=$("#l_piece").value,title=$("#l_title").value.trim(),url=$("#l_url").value.trim();
+  let old=null,w;
+  if(pid&&writing[pid]){old=writing[pid];w=JSON.parse(JSON.stringify(old))}
+  else{if(!title){toast("Pick the piece or type its title.");$("#l_title").focus();return}w=blankPiece(nextWid());w.title=title;w.type="A"}
+  w.posts=[...(w.posts||[]),{ch,d,url}];if(["IDEA","DRAFT","REWORK"].includes(w.status))w.status="PUBLISHED";if(!w.date)w.date=d;w.updatedAt=todayISO();
+  $("#lSave").disabled=true;
+  try{if(await writePiece(old,w)){closeLog();render();toast(`Logged on ${chName(ch)}`)}}finally{$("#lSave").disabled=false}
+}
+/* review block */
+function writingReviewHTML(wk){
+  if(!wmeta)return "";const mon=mondayOfWeekId(wk),sun=addDays(mon,6);
+  const rows=channels().map(c=>({c,s:chWeek(c,mon)})).filter(x=>x.s.expected||x.s.done);
+  const ps=[];wlist().forEach(w=>(w.posts||[]).forEach(p=>{if(p.d>=mon&&p.d<=sun)ps.push({w,p})}));
+  const ideas=wlist().filter(w=>w.created&&w.created>=mon&&w.created<=sun&&!(w.posts||[]).length);
+  if(!rows.length&&!ps.length&&!ideas.length)return "";
+  return `<div class="qa" style="margin-bottom:18px"><section class="qblock"><h3>Writing and posting</h3><ul>${rows.map(({c,s})=>`<li class="${s.done>=s.expected?"good":s.done?"warn":"bad"}">${esc(c.name)}: ${s.expected?`${s.done} of ${s.expected} posted`:`${s.done} posted, none scheduled`}</li>`).join("")}${ps.map(({w,p})=>`<li class="good"><button class="link" data-wopen="${esc(w.id)}">Posted on ${esc(chName(p.ch))}: ${esc(w.title)}</button></li>`).join("")}${ideas.length?`<li>${ideas.length} new idea${ideas.length>1?"s":""} captured and waiting</li>`:""}</ul></section></div>`;
+}
+
+async function backupAll(){
+  if(window.ccData)return window.ccData.exportAll();
+  const docs=[];for(const c of ["projects","activity","reviews","meta","writing"]){const s=await db.collection(c).limit(1000).get();s.docs.forEach(d=>{if(d.exists)docs.push({path:c+"/"+d.id,data:d.data()})})}
+  return {format:"control-centre-export",version:1,exportedAt:new Date().toISOString(),docs};
+}
 /* rules tab */
 function renderRules(){
   $("#tab-rules").innerHTML=`${comboMapHTML()}<div class="panel"><h2>How the products connect</h2><p class="sub">The strongest long-term opportunity is the ecosystem, where audience, knowledge, technology, research, community and IP keep feeding one another. Tap a project to open it.</p>${connHTML()}</div>
@@ -1147,12 +1489,12 @@ function renderRules(){
   <div class="panel"><h2>Priority rules</h2><ol class="rules"><li>Protect products that already have paying customers.</li><li>Finish near-complete products before creating additional M1 concepts.</li><li>Use external deadlines to override ordinary priority where necessary.</li><li>Prefer projects that strengthen several other projects at once.</li><li>Give extra weight to short time-to-revenue and repeatable delivery.</li><li>Do not confuse intellectual excitement with execution priority.</li><li>Do not kill a project merely because it is old.</li><li>Do not build a new version of an existing capability if an existing project can absorb it.</li></ol></div>
   <div class="panel"><h2>Locked decisions</h2><ul class="rules"><li>OPHTHA CHECK is the ophthalmology product name. Never "After Check".</li><li>Barki v0.1 has a locked 26-glyph A-Z mapping. Changes must be versioned.</li><li>Plinth is not part of the BuildNET business portfolio.</li><li>WWTBAA is a recurring operating programme.</li><li>BuildNET PPCE Academy is a live monetized product.</li><li>BuildNET Academy is a real product already used by a learner for examination preparation.</li><li>UCH Nurses KPI System is a monetized professional workflow product.</li></ul></div>
   <div class="panel"><h2>Settings</h2><div class="fs"><div class="f"><label for="setForgot">Days before a project counts as forgotten</label><input id="setForgot" type="number" min="7" max="365" value="${settings.forgottenDays}"></div></div></div>
-  <div class="panel"><h2>Voice update AI</h2><p class="sub">A free Gemini key reads your dictated updates and screenshots. The key is kept only in this browser, so add it on each device you use.</p>
-    <div class="fs"><div class="f full"><label for="aiKey">Gemini API key</label><input id="aiKey" type="password" autocomplete="off" value="${esc(window.ccAI?window.ccAI.key():"")}" placeholder="Paste the key from aistudio.google.com"></div>
-    <div class="f full"><label for="aiModel">Model</label><select id="aiModel"><option value="${esc(window.ccAI?window.ccAI.model():"")}">${esc((window.ccAI&&window.ccAI.model())||"Pick automatically")}</option></select></div></div>
-    <div class="quick" style="margin-top:10px"><button class="btn" id="aiFind" type="button">Find my models</button><button class="btn primary" id="aiSave" type="button">Save key</button></div><p class="sub" id="aiMsg" style="margin-top:8px"></p></div>
-  <div class="panel"><h2>Account and data</h2><p class="sub">Signed in as <b>${esc(window.ccAccount?window.ccAccount.email():"")}</b>. Download a backup now and then; it holds every project, log and review.</p>
-    <div class="quick"><button class="btn" id="dataExport" type="button">Download backup</button><label class="filebtn">Import a backup<input id="dataImport" type="file" accept=".json,application/json"></label><button class="btn" id="signOut" type="button">Sign out</button></div><p class="sub" id="dataMsg" style="margin-top:8px"></p></div>`;
+  ${window.ccAI?`<div class="panel"><h2>Voice update AI</h2><p class="sub">A free Gemini key reads your dictated updates and screenshots and drafts writing in your voice. The key stays in this browser only, so add it on each device you use.</p>
+    <div class="fs"><div class="f full"><label for="aiKey">Gemini API key</label><input id="aiKey" type="password" autocomplete="off" value="${esc(window.ccAI.key())}" placeholder="Paste the key from aistudio.google.com"></div>
+    <div class="f full"><label for="aiModel">Model</label><select id="aiModel"><option value="${esc(window.ccAI.model())}">${esc(window.ccAI.model()||"Pick automatically")}</option></select></div></div>
+    <div class="quick" style="margin-top:10px"><button class="btn" id="aiFind" type="button">Find my models</button><button class="btn primary" id="aiSave" type="button">Save key</button></div><p class="sub" id="aiMsg" style="margin-top:8px"></p></div>`:""}
+  <div class="panel"><h2>Backup and moving</h2><p class="sub">${window.ccAccount?`Signed in as <b>${esc(window.ccAccount.email())}</b>. `:""}Download a backup now and then. It holds every project, milestone, log, review and piece of writing${window.ccData?"":", and it's the file you import into the GitHub version"}.</p>
+    <div class="quick"><button class="btn" id="dataExport" type="button">Download backup</button>${window.ccData?`<label class="filebtn">Import a backup<input id="dataImport" type="file" accept=".json,application/json"></label><button class="btn" id="signOut" type="button">Sign out</button>`:""}</div><p class="sub" id="dataMsg" style="margin-top:8px"></p></div>`;
 }
 
 /* export */
@@ -1169,11 +1511,6 @@ document.addEventListener("click",e=>{
   if(t.dataset.go){view=t.dataset.go;setTab("register");render();return}
   if(t.dataset.tabgo){setTab(t.dataset.tabgo);return}
   if(t.dataset.tab){setTab(t.dataset.tab);return}
-  if(t.id==="aiFind"){const k=$("#aiKey").value.trim();const m=$("#aiMsg");if(!k){m.textContent="Paste your key first.";return}m.textContent="Asking Google which models your key can use…";window.ccAI.listModels(k).then(list=>{$("#aiModel").innerHTML=list.map((n,i)=>`<option value="${esc(n)}"${i===0?" selected":""}>${esc(n)}${i===0?" (recommended)":""}</option>`).join("");m.textContent=list.length?`${list.length} models found. The first is picked for you.`:"No suitable models found for this key."}).catch(e=>{m.textContent=e.message||"That key didn't work."});return}
-  if(t.id==="aiSave"){window.ccAI.save($("#aiKey").value.trim(),$("#aiModel").value);$("#aiMsg").textContent=$("#aiKey").value.trim()?"Saved on this device. Voice updates will now be read automatically.":"Key removed from this device.";return}
-  if(t.id==="dataExport"){window.ccData.exportAll().then(d=>downloads?downloads.save({filename:"control-centre-backup-"+todayISO()+".json",data:JSON.stringify(d,null,1)}):0).catch(()=>toast("Backup failed. Try again."));return}
-  if(t.id==="dataImportGo"){const n=pendingImport;if(!n)return;t.disabled=true;$("#dataMsg").textContent="Importing…";window.ccData.importAll(n).then(c=>{$("#dataMsg").textContent=`Imported ${c} records. Reloading…`;setTimeout(()=>location.reload(),900)}).catch(e=>{$("#dataMsg").textContent=e.message||"Import failed.";t.disabled=false});return}
-  if(t.id==="signOut"){window.ccAccount.signOut();return}
   if(t.dataset.help){scheduleHelp(t.dataset.help);return}
   if(t.dataset.msdone){markMsDone(t.dataset.msdone);return}
   if(t.dataset.jump){document.getElementById(t.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
@@ -1189,18 +1526,51 @@ document.addEventListener("click",e=>{
   if(t.id==="uNote"){saveNoteOnly();return}
   if(t.dataset.rmshot){const i=+t.dataset.rmshot;upd.text=$("#updText").value;URL.revokeObjectURL(upd.files[i].url);upd.files.splice(i,1);renderUpdate();return}
   if(t.dataset.newproj){const n=upd.proposal.newProjects[+t.dataset.newproj];closeUpdate();const ids=Object.keys(projects).map(k=>parseInt(k.slice(1),10)).filter(x=>!isNaN(x));const nn=Math.max(settings.nextId||51,...ids.map(x=>x+1));openDrawer("P"+String(nn).padStart(2,"0"),true,{name:n.name,category:n.category,purpose:n.purpose});return}
+  if(t.dataset.open&&writing[t.dataset.open]){openPiece(t.dataset.open);return}
+  if(t.dataset.wopen){openPiece(t.dataset.wopen);return}
+  if(t.dataset.wsub){wsub=t.dataset.wsub;renderWriting();return}
+  if(t.dataset.wsubgo){wsub=t.dataset.wsubgo;setTab("writing");return}
+  if(t.dataset.wcap){wsub="ideas";setTab("writing");setTimeout(()=>$("#cap_obs")?.focus(),50);return}
+  if(t.dataset.wlog){openLog(t.dataset.wlog,"");return}
+  if(t.dataset.wlogp){openLog("",t.dataset.wlogp);return}
+  if(t.dataset.wasset){wfilter={status:"",series:"",ch:"",q:"",asset:t.dataset.wasset};wsub="register";renderWriting();window.scrollTo(0,0);return}
+  if(t.dataset.wclear){wfilter={status:"",series:"",ch:"",q:"",asset:""};renderWriting();return}
+  if(t.dataset.wcopy){const el=$("#"+t.dataset.wcopy);if(el){const v=el.value;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast("Copied")).catch(()=>{el.focus();el.select();toast("Selected. Copy it from here.")})}return}
+  if(t.dataset.wpostrm){wDraftPosts=readPostsRaw();wDraftPosts.splice(+t.dataset.wpostrm,1);$("#wPosts").innerHTML=postsEditor();return}
+  if(t.id==="wPostAdd"){wDraftPosts=readPostsRaw();const c0=channels()[0]||channels(true)[0];wDraftPosts.push({ch:c0?c0.id:"",d:todayISO(),url:""});$("#wPosts").innerHTML=postsEditor();return}
+  if(t.id==="wNew"){openPiece(null);return}
+  if(t.id==="wSave"){savePiece();return}
+  if(t.id==="wDelete"){deletePiece();return}
+  if(t.id==="wClose"||t.id==="wCancel"||t.id==="wScrim"){closePiece();return}
+  if(t.id==="wDraft"){draftVoice();return}
+  if(t.id==="capSave"){captureIdea(false);return}
+  if(t.id==="capDraft"){captureIdea(true);return}
+  if(t.id==="lSave"){saveLog();return}
+  if(t.id==="lClose"){closeLog();return}
+  if(t.id==="wStarter"){saveWmeta({...(wmeta||{}),channels:DEFAULT_CHANNELS,voice:(wmeta&&wmeta.voice)||DEFAULT_VOICE,since:(wmeta&&wmeta.since)||todayISO()},"Starter schedule saved").then(()=>render());return}
+  if(t.id==="chAdd"){const cur=readChannels();cur.push({id:"ch"+Math.random().toString(36).slice(2,7),name:"",platform:"whatsapp",purpose:"",days:[],every:1,anchor:"",active:true});$("#chEd").innerHTML=cur.map(chEditRow).join("");return}
+  if(t.dataset.chrm){const cur=readChannels();cur.splice(+t.dataset.chrm,1);$("#chEd").innerHTML=cur.map(chEditRow).join("");return}
+  if(t.id==="schedSave"){const next={...(wmeta||{}),channels:readChannels(),voice:$("#wVoice").value,since:(wmeta&&wmeta.since)||todayISO()};saveWmeta(next,"Schedule and voice saved").then(ok=>{if(ok)$("#schedMsg").textContent="Saved."});return}
+  if(t.id==="aiFind"){const k=$("#aiKey").value.trim(),m=$("#aiMsg");if(!k){m.textContent="Paste your key first.";return}m.textContent="Asking Google which models your key can use…";window.ccAI.listModels(k).then(L=>{$("#aiModel").innerHTML=L.map((n,i)=>`<option value="${esc(n)}"${i===0?" selected":""}>${esc(n)}${i===0?" (recommended)":""}</option>`).join("");m.textContent=L.length?`${L.length} models found. The first is picked for you.`:"No suitable models found for this key."}).catch(e=>{m.textContent=(e&&e.message)||"That key didn't work."});return}
+  if(t.id==="aiSave"){window.ccAI.save($("#aiKey").value.trim(),$("#aiModel").value);$("#aiMsg").textContent=$("#aiKey").value.trim()?"Saved on this device. Updates and drafts will now be read automatically.":"Key removed from this device.";return}
+  if(t.id==="dataExport"){if(!db){toast("Sign in first.");return}const m=$("#dataMsg");if(m)m.textContent="Preparing backup…";backupAll().then(d=>{if(!downloads){if(m)m.textContent="Downloads aren't available here.";return}return downloads.save({filename:"control-centre-backup-"+todayISO()+".json",data:JSON.stringify(d,null,1)}).then(()=>{if(m)m.textContent=`Backup ready: ${d.docs.length} records.`})}).catch(()=>{if(m)m.textContent="Backup didn't complete. Try again."});return}
+  if(t.id==="dataImportGo"){if(!pendingImport)return;t.disabled=true;$("#dataMsg").textContent="Importing…";window.ccData.importAll(pendingImport).then(c=>{$("#dataMsg").textContent=`Imported ${c} records. Reloading…`;setTimeout(()=>location.reload(),900)}).catch(e=>{$("#dataMsg").textContent=(e&&e.message)||"Import failed.";t.disabled=false});return}
+  if(t.id==="signOut"){window.ccAccount.signOut();return}
   if(t.dataset.open&&projects[t.dataset.open]){openDrawer(t.dataset.open,false);return}
   if(t.dataset.week){setWeek(t.dataset.week,true);return}
   if(t.dataset.unweek){setWeek(t.dataset.unweek,false);return}
   if(t.id==="wkPrev")shiftWeek(-1);else if(t.id==="wkNext")shiftWeek(1);else if(t.id==="wkNow"){reviewWeek=weekId(new Date());subscribeReview()}
 });
+let wqTimer=null;
 document.addEventListener("input",e=>{
+  if(e.target.id==="wq"){clearTimeout(wqTimer);const v=e.target.value;wqTimer=setTimeout(()=>{wfilter={...wfilter,q:v};renderWriting();const i=$("#wq");if(i){i.focus();i.setSelectionRange(v.length,v.length)}},250);return}
   if(e.target.dataset.wo)onWeekOutcome(e.target.dataset.wo,e.target.value);
   if(e.target.id==="rvNotes")onNotes(e.target.value);
 });
 let pendingImport=null;
 document.addEventListener("change",async e=>{
-  if(e.target.id==="dataImport"){const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.format!=="control-centre-export")throw 0;pendingImport=j;const m=$("#dataMsg");m.innerHTML=`${j.docs.length} records in ${esc(f.name)}. Matching records will be replaced. <button class="btn primary" id="dataImportGo" type="button">Import now</button>`}catch(_){$("#dataMsg").textContent="That file isn't a Control Centre backup."}return}
+  if(e.target.id==="dataImport"){const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.format!=="control-centre-export")throw 0;pendingImport=j;$("#dataMsg").innerHTML=`${j.docs.length} records in ${esc(f.name)}. Matching records will be replaced. <button class="btn primary" id="dataImportGo" type="button">Import now</button>`}catch(_){$("#dataMsg").textContent="That file isn't a Control Centre backup."}return}
+  if(["wfs","wfser","wfch"].includes(e.target.id)){wfilter={...wfilter,status:$("#wfs").value,series:$("#wfser").value,ch:$("#wfch").value};renderWriting();return}
   if(e.target.id==="updFiles"){addFiles([...e.target.files]);return}
   if(e.target.id&&/^u\d+_.+_c$/.test(e.target.id)){e.target.closest(".chg").classList.toggle("off",!e.target.checked);return}
   if(e.target.dataset&&e.target.dataset.done){setDone(e.target.dataset.done,e.target.checked);return}
@@ -1212,12 +1582,12 @@ $("#addBtn").onclick=()=>{const ids=Object.keys(projects).map(k=>parseInt(k.slic
 $("#exportBtn").onclick=exportCsv;
 $("#dClose").onclick=closeDrawer;$("#dCancel").onclick=closeDrawer;$("#scrim").onclick=closeDrawer;
 $("#dSave").onclick=save;$("#dDelete").onclick=archive;
-document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#updRoot").hidden)closeUpdate();else if(!$("#drawerRoot").hidden)closeDrawer()});
-$("#updScrim").onclick=closeUpdate;
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#lRoot").hidden){closeLog();return}if(!$("#wRoot").hidden){closePiece();return}if(!$("#updRoot").hidden)closeUpdate();else if(!$("#drawerRoot").hidden)closeDrawer()});
+$("#updScrim").onclick=closeUpdate;$("#wScrim").onclick=closePiece;$("#lScrim").onclick=closeLog;
 document.addEventListener("paste",e=>{if($("#updRoot").hidden||upd.stage!=="compose")return;const imgs=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith("image/"));if(imgs.length){e.preventDefault();addFiles(imgs)}});
-function setTab(k){tab=k;document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===k));["focus","register","roadmap","review","rules"].forEach(x=>$("#tab-"+x).hidden=x!==k);
-  if(k==="focus")renderFocus();if(k==="roadmap")renderRoadmap();if(k==="review")subscribeReview();if(k==="rules")renderRules();window.scrollTo(0,0)}
-const h=(location.hash||"").slice(1);if(["register","roadmap","review","rules"].includes(h))setTab(h);
+function setTab(k){tab=k;document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===k));["focus","register","roadmap","writing","review","rules"].forEach(x=>$("#tab-"+x).hidden=x!==k);
+  if(k==="focus")renderFocus();if(k==="writing")renderWriting();if(k==="roadmap")renderRoadmap();if(k==="review")subscribeReview();if(k==="rules")renderRules();window.scrollTo(0,0)}
+const h=(location.hash||"").slice(1);if(["register","roadmap","writing","review","rules"].includes(h))setTab(h);
 
 render();
 
@@ -1230,7 +1600,7 @@ render();
   window.claude.use("sample").then(async sm=>{sample=sm;if(sm){try{const l=await sm.limits();imgLimits=l&&l.images||null}catch(_){imgLimits=null}}if(!$("#updRoot").hidden&&upd.stage==="compose")renderUpdate()});
   window.claude.use("assets").then(a=>{assets=a});
   if(downloads)$("#exportBtn").hidden=false;
-  if(!db){loaded=true;showStatus("Sign in to claude.ai to load and edit the register.");render();return}
+  if(!db){loaded=true;showStatus("Sign in to load and edit the register.");render();return}
   if(user){try{const c=await user.can("data.write");if(c===false){canWrite=false;$("#addBtn").hidden=true;showStatus("View-only: you can browse the register but not change it.")}}catch(_){}}
   const wk=weekId(new Date());let gotSettings=false,gotProjects=false,rolled=false;
   const maybeRoll=async()=>{
@@ -1244,6 +1614,8 @@ render();
   db.doc("meta/settings").onSnapshot(s=>{if(s.exists)settings={forgottenDays:30,nextId:51,...s.data()};gotSettings=true;maybeRoll();render()},()=>{gotSettings=true});
   db.doc("activity/"+wk).onSnapshot(s=>{if(s.metadata.hasPendingWrites)return;activity[wk]=s.exists?(s.data().events||[]):[];render()},()=>{});
   db.doc("reviews/"+wk).get().then(r=>{storedReview[wk]=r.exists?{...r.data()}:{};scheduleGen()}).catch(()=>{});
+  db.collection("writing").onSnapshot(snap=>{const n={};snap.docs.forEach(d=>{if(d.exists)n[d.id]={...d.data(),id:d.id}});writing=n;render()},()=>{});
+  db.doc("meta/writing").onSnapshot(s=>{wmeta=s.exists?{...s.data()}:null;render()},()=>{});
   db.collection("projects").onSnapshot(snap=>{
     const next={};snap.docs.forEach(d=>{if(d.exists)next[d.id]={...d.data(),id:d.id}});
     projects=next;loaded=true;gotProjects=true;maybeRoll();render();scheduleGen();
