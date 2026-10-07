@@ -15,10 +15,10 @@ drop policy if exists "owner reads" on public.docs;
 drop policy if exists "owner inserts" on public.docs;
 drop policy if exists "owner updates" on public.docs;
 drop policy if exists "owner deletes" on public.docs;
-create policy "owner reads"   on public.docs for select using (owner = auth.uid());
-create policy "owner inserts" on public.docs for insert with check (owner = auth.uid());
-create policy "owner updates" on public.docs for update using (owner = auth.uid()) with check (owner = auth.uid());
-create policy "owner deletes" on public.docs for delete using (owner = auth.uid());
+create policy "owner reads"   on public.docs for select to authenticated using (owner = (select auth.uid()));
+create policy "owner inserts" on public.docs for insert to authenticated with check (owner = (select auth.uid()));
+create policy "owner updates" on public.docs for update to authenticated using (owner = (select auth.uid())) with check (owner = (select auth.uid()));
+create policy "owner deletes" on public.docs for delete to authenticated using (owner = (select auth.uid()));
 
 -- live sync between phone and laptop
 alter table public.docs replica identity full;
@@ -34,9 +34,9 @@ on conflict (id) do nothing;
 drop policy if exists "owner reads shots" on storage.objects;
 drop policy if exists "owner uploads shots" on storage.objects;
 drop policy if exists "owner deletes shots" on storage.objects;
-create policy "owner reads shots" on storage.objects for select
-  using (bucket_id = 'shots' and (storage.foldername(name))[1] = auth.uid()::text);
-create policy "owner uploads shots" on storage.objects for insert
-  with check (bucket_id = 'shots' and (storage.foldername(name))[1] = auth.uid()::text);
-create policy "owner deletes shots" on storage.objects for delete
-  using (bucket_id = 'shots' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy "owner reads shots" on storage.objects for select to authenticated
+  using (bucket_id = 'shots' and (storage.foldername(name))[1] = (select auth.uid())::text);
+create policy "owner uploads shots" on storage.objects for insert to authenticated
+  with check (bucket_id = 'shots' and (storage.foldername(name))[1] = (select auth.uid())::text);
+create policy "owner deletes shots" on storage.objects for delete to authenticated
+  using (bucket_id = 'shots' and (storage.foldername(name))[1] = (select auth.uid())::text);
