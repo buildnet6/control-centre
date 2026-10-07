@@ -207,13 +207,25 @@
   }).observe(document.documentElement, { childList: true, subtree: true });
 
   /* ---------- sample: Gemini reads dictated updates ---------- */
+  /* Gemini keys come as AIza... (older) or AQ. (newer). Try the key in the URL, then as a header. */
+  async function gfetch(url, key, init) {
+    init = init || {};
+    const sep = url.includes("?") ? "&" : "?";
+    let r = await fetch(url + sep + "key=" + encodeURIComponent(key), init);
+    if (r.status === 400 || r.status === 401 || r.status === 403) {
+      const h = Object.assign({}, init.headers || {}, { "x-goog-api-key": key });
+      const r2 = await fetch(url, Object.assign({}, init, { headers: h }));
+      if (r2.ok || ![400, 401, 403].includes(r2.status)) return r2;
+    }
+    return r;
+  }
   window.ccAI = {
     key: () => LS.get("cc_gemini_key") || "",
     model: () => LS.get("cc_gemini_model") || "",
     save(key, model) { LS.set("cc_gemini_key", key || null); LS.set("cc_gemini_model", model || null) },
     async listModels(key) {
-      const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key=" + encodeURIComponent(key));
-      if (!r.ok) throw { code: "bad_key", message: "Google rejected that key." };
+      const r = await gfetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", key);
+      if (!r.ok) throw { code: "bad_key", message: "Google rejected that key. Check you copied all of it, with no spaces." };
       const j = await r.json();
       const ok = (j.models || []).filter(m => (m.supportedGenerationMethods || []).includes("generateContent")).map(m => m.name.replace(/^models\//, ""))
         .filter(n => /gemini/i.test(n) && !/(image|tts|audio|live|embed|vision-preview|thinking-exp)/i.test(n));
@@ -250,7 +262,7 @@
     if (opts.images) for (const im of Array.from(opts.images)) parts.push(await toPart(im));
     let r;
     try {
-      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`, {
+      r = await gfetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, key, {
         method: "POST", headers: { "Content-Type": "application/json" }, signal: opts.signal,
         body: JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.2 } })
       });
