@@ -277,6 +277,47 @@
     if (!text.trim()) throw { code: "empty_completion", message: "Empty reply" };
     return parseJSON(text);
   }
+  /* turn a voice recording into text: convert to 16 kHz mono WAV (a format Gemini always accepts), then transcribe */
+  async function toWav(blob) {
+    const buf = await blob.arrayBuffer();
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    const audio = await new Promise((res, rej) => { const p = ctx.decodeAudioData(buf, res, rej); if (p && p.then) p.then(res, rej); });
+    try { ctx.close(); } catch (_) {}
+    const rate = 16000, len = Math.ceil(audio.duration * rate);
+    const off = new OfflineAudioContext(1, len, rate);
+    const src = off.createBufferSource(); src.buffer = audio; src.connect(off.destination); src.start();
+    const out = await off.startRendering();
+    const pcm = out.getChannelData(0), dv = new DataView(new ArrayBuffer(44 + pcm.length * 2));
+    const w = (o, str) => { for (let i = 0; i < str.length; i++) dv.setUint8(o + i, str.charCodeAt(i)); };
+    w(0, "RIFF"); dv.setUint32(4, 36 + pcm.length * 2, true); w(8, "WAVE"); w(12, "fmt ");
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, rate, true);
+    dv.setUint32(28, rate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, "data"); dv.setUint32(40, pcm.length * 2, true);
+    for (let i = 0; i < pcm.length; i++) { const v = Math.max(-1, Math.min(1, pcm[i])); dv.setInt16(44 + i * 2, v < 0 ? v * 0x8000 : v * 0x7fff, true); }
+    return new Blob([dv], { type: "audio/wav" });
+  }
+  window.ccAI.transcribe = async function (blob) {
+    const key = window.ccAI.key(); if (!key) throw { code: "no_key" };
+    let model = window.ccAI.model();
+    if (!model) { const list = await window.ccAI.listModels(key); model = list[0]; if (!model) throw { code: "bad_key" }; LS.set("cc_gemini_model", model); }
+    let wav;
+    try { wav = await toWav(blob); } catch (_) { wav = blob; }
+    const data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1]); fr.onerror = rej; fr.readAsDataURL(wav); });
+    const mime = (wav.type || "audio/wav").split(";")[0];
+    const r = await gfetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, key, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ role: "user", parts: [
+        { text: "Transcribe this voice note word for word. The speaker is Arc. Ajibola Oladiran (Prof Newrock), a Nigerian architect, talking about his projects, such as BuildNET, PPCE Academy, Ophtha Check, BuildCAD, Nexus, WWTBAA, Spider, Gong, Line & Space, Stories That Build, The Club and Wazobia. Spell those names as written here. Use plain punctuation and short hyphens, never em dashes. Return only the transcript, with no notes or headings." },
+        { inline_data: { mime_type: mime, data } }
+      ] }], generationConfig: { temperature: 0 } })
+    });
+    if (r.status === 429) throw { code: "rate_limited" };
+    if (!r.ok) throw { code: "upstream_error", message: await r.text() };
+    const j = await r.json();
+    const text = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("").replace(/[—–]/g, "-").trim();
+    if (!text) throw { code: "empty" };
+    return text;
+  };
   const sample = async (input, opts) => { const out = await geminiJSON(input, opts); return { text: JSON.stringify(out), truncated: false, modelTierApplied: "default" } };
   sample.json = geminiJSON;
   sample.limits = async () => ({ maxPromptBytes: 900000, images: { maxCount: 4, maxInputBytes: 20e6, mediaTypes: ["image/jpeg", "image/png", "image/webp", "image/gif"] } });

@@ -302,6 +302,11 @@ button.link:hover{color:var(--indigo)}
 .postrow{display:grid;grid-template-columns:1fr 150px 1fr auto;gap:6px;margin-bottom:6px}
 .postrow select,.postrow input{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;min-width:0;width:100%}
 @media (max-width:560px){.postrow{grid-template-columns:1fr 1fr auto}.postrow input[id^="wp_u_"]{grid-column:1/3}}
+.microw{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.micbtn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:11px 20px;background:var(--laterite);color:var(--surface);font:600 15px var(--f-display);cursor:pointer}
+.micbtn.on{background:var(--bad)}
+@media (prefers-reduced-motion:no-preference){.micbtn.on{animation:micpulse 1.2s ease-in-out infinite}@keyframes micpulse{50%{box-shadow:0 0 0 8px var(--bad-soft)}}}
+.micmsg{color:var(--muted);font-size:13px;flex:1;min-width:0}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:60}
 .rules li{margin-bottom:6px;max-width:70ch}
 @media (max-width:560px){.brand h1{font-size:19px}.tabs{width:100%}.tabs button{flex:1;padding:7px 2px;font-size:13px}.fs{grid-template-columns:1fr}.stat b{font-size:22px}}
@@ -983,16 +988,16 @@ function openUpdate(focus){
   $("#updRoot").hidden=false;document.body.style.overflow="hidden";renderUpdate();
   setTimeout(()=>$("#updText")?.focus(),50);
 }
-function closeUpdate(){if(upd.ctl)upd.ctl.abort();upd.files.forEach(f=>f.url&&URL.revokeObjectURL(f.url));$("#updRoot").hidden=true;document.body.style.overflow=""}
-function projOptions(sel,auto){const L=list().filter(p=>p.priority!=="PX").sort((a,b)=>a.id.localeCompare(b.id));return (auto?`<option value="">Let Claude work it out from what I say</option>`:"")+L.map(p=>`<option value="${esc(p.id)}"${p.id===sel?" selected":""}>${esc(p.id)} · ${esc(p.name)}</option>`).join("")}
+function closeUpdate(){stopDict();if(upd.ctl)upd.ctl.abort();upd.files.forEach(f=>f.url&&URL.revokeObjectURL(f.url));$("#updRoot").hidden=true;document.body.style.overflow=""}
+function projOptions(sel,auto){const L=list().filter(p=>p.priority!=="PX").sort((a,b)=>a.id.localeCompare(b.id));return (auto?`<option value="">Work it out from what I say</option>`:"")+L.map(p=>`<option value="${esc(p.id)}"${p.id===sel?" selected":""}>${esc(p.id)} · ${esc(p.name)}</option>`).join("")}
 function renderUpdate(){
   const b=$("#uBody"),f=$("#uFoot");
   if(upd.stage==="compose"){
     $("#uTitle").textContent="Project update";
     const canImg=!!(sample&&imgLimits);
     b.innerHTML=`<div class="f"><label for="updProj">Which project</label><select id="updProj">${projOptions(upd.focus,true)}</select></div>
-      <div class="hint"><span>${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>'}</span><span>Tap the microphone key on your phone keyboard and talk. Say what you did, what changed, what's left and what comes next. Mention several projects if you like.</span></div>
-      <div class="f"><label for="updText">Your update</label><textarea id="updText" placeholder="Spider: finished the Personal Future Map wireframes and tested them with three students. Next I need the trend data model…">${esc(upd.text)}</textarea></div>
+      <div class="hint"><span>${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>'}</span><span>Tap <b>Talk</b> and speak. Say what you did, what changed, what's left and what comes next. Mention several projects if you like.</span></div>
+      <div class="f"><label for="updText">Your update</label><textarea id="updText" placeholder="Spider: finished the Personal Future Map wireframes and tested them with three students. Next I need the trend data model…">${esc(upd.text)}</textarea>${micBtn("updText")}</div>
       <div class="f"><label>Screenshots or text files (optional)</label>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><label class="filebtn">Add files<input id="updFiles" type="file" multiple accept="${canImg?esc(imgLimits.mediaTypes.join(","))+",":""}.txt,.md,.csv,.json,text/plain"></label><small style="color:var(--muted)">${canImg?`Up to ${imgLimits.maxCount} images. Text files are added to your update.`:"Text files are added to your update."}</small></div>
         ${upd.files.length?`<div class="shots" style="margin-top:8px">${upd.files.map((x,i)=>`<span class="shot"><img src="${x.url}" alt="Attached screenshot ${i+1}"><button data-rmshot="${i}" aria-label="Remove screenshot">×</button></span>`).join("")}</div>`:""}
@@ -1295,9 +1300,9 @@ function wWeekHTML(){
 function wRow(w){const chs=[...new Set((w.posts||[]).map(p=>chName(p.ch)))];return `<button class="wrow" data-wopen="${esc(w.id)}"><span class="wid">${esc(w.id)}</span><span class="wmain"><b>${esc(w.title||"Untitled")}</b><small>${[w.series,w.theme,chs.join(", "),w.date?fmtDate(w.date):""].filter(Boolean).map(esc).join(" · ")}</small></span><span class="wst st-${esc((w.status||"").replace(/ /g,"-").toLowerCase())}">${esc(w.status)}</span>${w.type?`<span class="wtype" title="${esc(W_TYPES[w.type]||"")}">${esc(w.type)}</span>`:""}</button>`}
 function wIdeasHTML(){
   const q=wlist().filter(w=>["IDEA","DRAFT","REWORK"].includes(w.status)).sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999")||a.id.localeCompare(b.id));
-  return `<div class="panel" id="wcap"><h2>Capture an idea</h2><p class="sub">Tap the microphone on your keyboard and say it. Two answers are enough.</p>
-  <div class="fs"><div class="f full"><label for="cap_obs">What ordinary thing did you notice?</label><textarea id="cap_obs" rows="2" placeholder="Students carrying their stools from one studio to another…"></textarea></div>
-  <div class="f full"><label for="cap_q">What larger question does it expose?</label><textarea id="cap_q" rows="2" placeholder="Who is the studio really designed for?"></textarea></div>
+  return `<div class="panel" id="wcap"><h2>Capture an idea</h2><p class="sub">Tap <b>Talk</b> and say it. Two answers are enough.</p>
+  <div class="fs"><div class="f full"><label for="cap_obs">What ordinary thing did you notice?</label><textarea id="cap_obs" rows="2" placeholder="Students carrying their stools from one studio to another…"></textarea>${micBtn("cap_obs")}</div>
+  <div class="f full"><label for="cap_q">What larger question does it expose?</label><textarea id="cap_q" rows="2" placeholder="Who is the studio really designed for?"></textarea>${micBtn("cap_q")}</div>
   <div class="f"><label for="cap_title">Working title (optional)</label><input id="cap_title"></div>
   <div class="f"><label for="cap_theme">Theme</label><select id="cap_theme">${W_THEMES.map(x=>`<option>${esc(x)}</option>`).join("")}</select></div>
   <div class="f"><label for="cap_series">Series (optional)</label><input id="cap_series" list="seriesList"></div>
@@ -1481,6 +1486,70 @@ async function backupAll(){
   const docs=[];for(const c of ["projects","activity","reviews","meta","writing"]){const s=await db.collection(c).limit(1000).get();s.docs.forEach(d=>{if(d.exists)docs.push({path:c+"/"+d.id,data:d.data()})})}
   return {format:"control-centre-export",version:1,exportedAt:new Date().toISOString(),docs};
 }
+/* dictation: a Talk button on text boxes. Uses the phone's speech service when it works,
+   otherwise records audio and has Gemini transcribe it. */
+const MIC_ICON='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+const SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
+let dict=null, srBroken=false;
+function micBtn(id){return `<div class="microw"><button type="button" class="micbtn" data-mic="${id}" aria-label="Dictate into this box">${MIC_ICON}<span>Talk</span></button><small class="micmsg" id="micmsg_${id}"></small></div>`}
+function micSay(id,t){const m=$("#micmsg_"+id);if(m)m.textContent=t||""}
+function micUI(btn,on,label){if(!btn)return;btn.classList.toggle("on",!!on);const s=btn.querySelector("span");if(s)s.textContent=label||(on?"Stop":"Talk")}
+async function toggleMic(btn){
+  if(dict){const same=dict.btn===btn;stopDict();if(same)return}
+  const id=btn.dataset.mic,ta=$("#"+id);if(!ta)return;
+  dict={btn,id,ta,base:ta.value.trim()?ta.value.replace(/\s*$/," "):"",keep:true};
+  micUI(btn,true,"Stop");micSay(id,"Starting…");
+  if(SpeechRec&&!srBroken){startSpeech();return}
+  startRecording();
+}
+function startSpeech(){
+  const d=dict;let r;
+  try{r=new SpeechRec()}catch(_){srBroken=true;startRecording();return}
+  r.lang="en-NG";r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+  let got=false;d.mode="speech";d.rec=r;
+  r.onstart=()=>micSay(d.id,"Listening… speak now. Tap Stop when you finish.");
+  r.onresult=e=>{let fin="",tmp="";for(let i=0;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else tmp+=t}got=true;d.ta.value=(d.base+fin+tmp);if(fin){d.base=(d.base+fin).replace(/\s*$/," ")}};
+  r.onerror=e=>{
+    if(e.error==="no-speech"||e.error==="aborted")return;
+    if(e.error==="not-allowed"&&!got){micSay(d.id,"Microphone blocked. Allow the microphone for this site in your browser settings, then try again.");d.keep=false;stopDict();return}
+    srBroken=true;d.keep=false;try{r.abort()}catch(_){}
+    if(dict===d){dict.rec=null;startRecording()}
+  };
+  r.onend=()=>{if(dict===d&&d.keep&&d.mode==="speech"){try{r.start()}catch(_){stopDict()}}};
+  try{r.start()}catch(_){srBroken=true;startRecording()}
+}
+async function startRecording(){
+  const d=dict;if(!d)return;
+  if(!navigator.mediaDevices||!window.MediaRecorder){micSay(d.id,"This browser can't record. Type instead, or use your keyboard's voice typing.");stopDict();return}
+  if(!(window.ccHasKey&&window.ccHasKey())){micSay(d.id,"Add your Gemini key in Map → Voice update AI so recordings can be turned into text.");stopDict();return}
+  let stream;
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(_){micSay(d.id,"Microphone blocked. Allow the microphone for this site in your browser settings, then try again.");stopDict();return}
+  if(dict!==d){stream.getTracks().forEach(t=>t.stop());return}
+  const mr=new MediaRecorder(stream);d.mode="record";d.stream=stream;d.chunks=[];d.rec=mr;d.t0=Date.now();
+  mr.ondataavailable=e=>{if(e.data&&e.data.size)d.chunks.push(e.data)};
+  mr.onstop=()=>transcribeRecording(d);
+  mr.start(1000);micSay(d.id,"Recording… tap Stop when you finish.");
+  d.timer=setInterval(()=>{const s=Math.round((Date.now()-d.t0)/1000);micSay(d.id,`Recording ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}… tap Stop when you finish.`);if(s>=600)stopDict()},1000);
+}
+function stopDict(){
+  const d=dict;if(!d)return;dict=null;d.keep=false;
+  if(d.timer)clearInterval(d.timer);
+  if(d.mode==="speech"){try{d.rec&&d.rec.stop()}catch(_){};micUI(d.btn,false);micSay(d.id,d.ta.value.trim()?"Done. Check the text, then carry on.":"Nothing heard. Tap Talk and try again.");d.ta.dispatchEvent(new Event("input",{bubbles:true}));return}
+  if(d.mode==="record"&&d.rec&&d.rec.state!=="inactive"){micUI(d.btn,true,"Working…");micSay(d.id,"Turning your recording into text…");d.rec.stop();return}
+  micUI(d.btn,false);
+}
+async function transcribeRecording(d){
+  try{d.stream.getTracks().forEach(t=>t.stop())}catch(_){}
+  try{
+    const blob=new Blob(d.chunks,{type:(d.rec&&d.rec.mimeType)||"audio/webm"});
+    if(blob.size<2000)throw {code:"empty"};
+    const text=await window.ccAI.transcribe(blob);
+    d.ta.value=(d.base+text).trim();d.ta.dispatchEvent(new Event("input",{bubbles:true}));
+    micSay(d.id,"Done. Check the text, then carry on.");
+  }catch(e){micSay(d.id,e&&e.code==="empty"?"Nothing recorded. Tap Talk and try again.":e&&e.code==="rate_limited"?"Free Gemini limit reached for now. Try again in a minute.":"Couldn't turn the recording into text. Try again.")}
+  finally{micUI(d.btn,false)}
+}
+
 /* rules tab */
 function renderRules(){
   $("#tab-rules").innerHTML=`${comboMapHTML()}<div class="panel"><h2>How the products connect</h2><p class="sub">The strongest long-term opportunity is the ecosystem, where audience, knowledge, technology, research, community and IP keep feeding one another. Tap a project to open it.</p>${connHTML()}</div>
@@ -1511,6 +1580,7 @@ document.addEventListener("click",e=>{
   if(t.dataset.go){view=t.dataset.go;setTab("register");render();return}
   if(t.dataset.tabgo){setTab(t.dataset.tabgo);return}
   if(t.dataset.tab){setTab(t.dataset.tab);return}
+  if(t.dataset.mic){toggleMic(t);return}
   if(t.dataset.help){scheduleHelp(t.dataset.help);return}
   if(t.dataset.msdone){markMsDone(t.dataset.msdone);return}
   if(t.dataset.jump){document.getElementById(t.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
