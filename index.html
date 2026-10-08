@@ -981,7 +981,7 @@ function shiftWeek(n){const [y,w]=reviewWeek.split("-W").map(Number);const d=new
 /* project updates: dictate or paste, Claude proposes field changes, you confirm */
 let sample=null, assets=null, imgLimits=null;
 let upd={focus:"",text:"",files:[],stage:"compose",proposal:null,ctl:null,error:""};
-const UF={maturity:["Maturity","select",()=>MATS],state:["Current state","text"],character:["Current character","text"],revenue:["Current revenue","select",()=>REVENUE],money:["Money score","select",()=>[1,2,3,4,5,6]],priority:["Priority","select",()=>PRIORITIES],decision:["Decision","select",()=>DECISIONS],milestone:["Milestone","text"],next:["Next action","textarea"],exists:["What exists","textarea"],remains:["What remains","textarea"],deadline:["Deadline","date"],deadlineNote:["Deadline note","text"],weekDone:["This week's outcome done","select",()=>["true","false"]],milestones_done:["Milestones finished","textarea"],milestone_add:["New milestone (title | date)","text"],notes_append:["Add to notes","textarea"]};
+const UF={maturity:["Maturity","select",()=>MATS],name:["Project name","text"],state:["Current state","text"],character:["Current character","text"],revenue:["Current revenue","select",()=>REVENUE],money:["Money score","select",()=>[1,2,3,4,5,6]],priority:["Priority","select",()=>PRIORITIES],decision:["Decision","select",()=>DECISIONS],milestone:["Milestone","text"],next:["Next action","textarea"],exists:["What exists","textarea"],remains:["What remains","textarea"],deadline:["Deadline","date"],deadlineNote:["Deadline note","text"],weekDone:["This week's outcome done","select",()=>["true","false"]],milestones_done:["Milestones finished","textarea"],milestone_add:["New milestone (title | date)","text"],notes_append:["Add to notes","textarea"]};
 function openUpdate(focus){
   if(!db)return toast("Sign in to add updates.");
   upd={focus:focus||"",text:"",files:[],stage:"compose",proposal:null,ctl:null,error:""};
@@ -1051,7 +1051,7 @@ Rules:
 - milestones_done: exact titles of that project's milestones he says are now finished, one per line.
 - milestone_add: a new milestone he commits to, written as "title | YYYY-MM-DD" (date only if he gives or clearly implies one).
 - notes_append: facts worth keeping that fit no other field (figures, names, decisions, links).
-- Never rename a project. Respect locked decisions written in notes.
+- name: change it only when he clearly says the project now has a new name. Keep every other name exactly as it is, and respect locked decisions written in notes (for example the OPHTHA CHECK name).
 - summary: one or two sentences in plain English, first person, as he would say it ("Finished the..."). Use hyphens, never em dashes.
 - why: for each changed field, a few words of evidence from his update or screenshots.
 - A project he describes that is not in the register goes in newProjects.
@@ -1105,12 +1105,12 @@ async function readUpdate(){
     if(upd.files.length)opts.images=upd.files.map(f=>f.file);
     const r=await sample.json(buildPrompt(text||"(No spoken update. Read the screenshots.)",upd.focus,upd.files.length),opts);
     upd.proposal=cleanProposal(r,upd.focus);
-    if(!upd.proposal.updates.length&&!upd.proposal.newProjects.length){upd.stage="compose";upd.error="Claude couldn't match that to a project. Pick the project above and try again.";}
+    if(!upd.proposal.updates.length&&!upd.proposal.newProjects.length){upd.stage="compose";upd.error="Couldn't match that to a project. Pick the project in the list above and tap Read my update again.";}
     else upd.stage="review";
   }catch(e){
     upd.stage="compose";
     const c=e&&e.code;
-    upd.error=c==="cancelled"?"":c==="no_key"?"Add your free Gemini key in Map → Voice update AI, then try again. Or save this as a note.":c==="bad_key"?"Google rejected the Gemini key. Check it in Map → Voice update AI.":c==="not_granted"||c==="sampling_disabled"?"Claude isn't allowed for this page, so the update can't be read automatically. Save it as a note instead.":c==="rate_limited"?"You've hit the free Gemini limit for now. Save it as a note and read it later.":c==="image_rejected"?"One of the screenshots couldn't be read. Remove it and try again.":c==="images_unavailable"?"Screenshots can't be sent from this view. Remove them and try again.":c==="invalid_json"?"The reply came back garbled. Tap Read my update to try again.":"Something went wrong reading the update. Try again.";
+    upd.error=c==="cancelled"?"":c==="no_key"?"Add your free Gemini key in Map → Voice update AI, then try again. Or save this as a note.":c==="bad_key"?"Google rejected the Gemini key. Check it in Map → Voice update AI.":c==="not_granted"||c==="sampling_disabled"?"Claude isn't allowed for this page, so the update can't be read automatically. Save it as a note instead.":c==="rate_limited"?"You've hit the free Gemini limit for now. Save it as a note and read it later.":c==="image_rejected"?"One of the screenshots couldn't be read. Remove it and try again.":c==="images_unavailable"?"Screenshots can't be sent from this view. Remove them and try again.":c==="invalid_json"?"The reply came back garbled. Tap Read my update to try again.":"Something went wrong reading the update. Try again."+(e&&e.message?" Details: "+String(e.message).slice(0,180):"");
     if(c==="not_granted"||c==="sampling_disabled")sample=null;
   }
   upd.ctl=null;renderUpdate();
@@ -1172,7 +1172,7 @@ const CONNECTIONS=[
   [["P31","P43","P22","P02","P01","P21"],"→","Competition creates attention, the game makes architecture entertaining, the community distributes, the academies teach, and the Fellowship deepens professional development."],
   [["P09","P10"],"↔","Visual Lab is the application layer. The Motion Graphics Engine can become the generation layer underneath it."],
   [["P35","P07","P47"],"→","The research framework gives intellectual foundations to practical AI tools for architectural design."],
-  [["P05","P06"],"↔","Nexus maps the professional ecosystem and Eagle Eye maps development. Together they form a wider built-environment intelligence platform."],
+  [["P05","P06"],"↔","ArchiNET maps the professional ecosystem and Eagle Eye maps development. Together they form a wider built-environment intelligence platform."],
   [["P02","P22","P25"],"↔","Community creates attention, education creates value, and the SUPERMARKET handles the transaction."],
   [["P40","P39"],"↔","The book explains the philosophy and method. The software puts it to work."],
 ];

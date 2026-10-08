@@ -253,29 +253,40 @@
     const a = t.indexOf("{"), b = t.lastIndexOf("}"); if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)) } catch (_) {} }
     throw { code: "invalid_json", message: "Reply was not JSON", text: t };
   }
-  async function geminiJSON(input, opts = {}) {
+  /* call Gemini, moving to another available model if the saved one is refused, missing or busy */
+  async function gemini(parts, opts = {}, jsonMode = true) {
     const key = window.ccAI.key(); if (!key) throw { code: "no_key", message: "No Gemini key" };
-    let model = window.ccAI.model();
-    if (!model) { const list = await window.ccAI.listModels(key); model = list[0]; if (!model) throw { code: "bad_key" }; LS.set("cc_gemini_model", model) }
+    const saved = window.ccAI.model();
+    let list = [];
+    try { list = await window.ccAI.listModels(key); } catch (e) { if (!saved) throw e; }
+    const candidates = [...new Set([saved, ...list].filter(Boolean))].slice(0, 5);
+    if (!candidates.length) throw { code: "bad_key", message: "No models available for this key." };
+    const body = JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: jsonMode ? { responseMimeType: "application/json", temperature: 0.2 } : { temperature: 0 } });
+    let lastErr = null;
+    for (const model of candidates) {
+      let r;
+      try {
+        r = await gfetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, key, { method: "POST", headers: { "Content-Type": "application/json" }, signal: opts.signal, body });
+      } catch (e) { if (e && e.name === "AbortError") throw { code: "cancelled" }; lastErr = { code: "upstream_error", message: String(e) }; continue; }
+      if (r.ok) {
+        const j = await r.json();
+        if (j.promptFeedback && j.promptFeedback.blockReason) throw { code: "refused", message: j.promptFeedback.blockReason };
+        const text = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
+        if (!text.trim()) { lastErr = { code: "empty_completion", message: "Empty reply from " + model }; continue; }
+        if (model !== saved) LS.set("cc_gemini_model", model);
+        return text;
+      }
+      const t = await r.text();
+      if (/API_KEY_INVALID|API key not valid|API_KEY_SERVICE_BLOCKED/i.test(t)) throw { code: "bad_key", message: t.slice(0, 300) };
+      lastErr = { code: r.status === 429 ? "rate_limited" : "upstream_error", message: `${model}: ${r.status} ${t.slice(0, 200)}` };
+    }
+    throw lastErr || { code: "upstream_error", message: "No model answered." };
+  }
+  async function geminiJSON(input, opts = {}) {
     const prompt = typeof input === "string" ? input : input.map(t => t.content).join("\n\n");
     const parts = [{ text: prompt }];
     if (opts.images) for (const im of Array.from(opts.images)) parts.push(await toPart(im));
-    let r;
-    try {
-      r = await gfetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, key, {
-        method: "POST", headers: { "Content-Type": "application/json" }, signal: opts.signal,
-        body: JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.2 } })
-      });
-    } catch (e) { throw { code: e && e.name === "AbortError" ? "cancelled" : "upstream_error", message: String(e) } }
-    if (r.status === 429) throw { code: "rate_limited", message: "Gemini free-tier limit reached" };
-    if (r.status === 400 || r.status === 401 || r.status === 403) { const t = await r.text(); throw { code: /API key|PERMISSION|API_KEY/i.test(t) ? "bad_key" : "upstream_error", message: t } }
-    if (r.status === 404) { LS.set("cc_gemini_model", null); throw { code: "upstream_error", message: "Model not found. Try again to pick another." } }
-    if (!r.ok) throw { code: "upstream_error", message: await r.text() };
-    const j = await r.json();
-    if (j.promptFeedback && j.promptFeedback.blockReason) throw { code: "refused", message: j.promptFeedback.blockReason };
-    const text = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
-    if (!text.trim()) throw { code: "empty_completion", message: "Empty reply" };
-    return parseJSON(text);
+    return parseJSON(await gemini(parts, opts, true));
   }
   /* turn a voice recording into text: convert to 16 kHz mono WAV (a format Gemini always accepts), then transcribe */
   async function toWav(blob) {
@@ -298,23 +309,12 @@
   }
   window.ccAI.transcribe = async function (blob) {
     const key = window.ccAI.key(); if (!key) throw { code: "no_key" };
-    let model = window.ccAI.model();
-    if (!model) { const list = await window.ccAI.listModels(key); model = list[0]; if (!model) throw { code: "bad_key" }; LS.set("cc_gemini_model", model); }
     let wav;
     try { wav = await toWav(blob); } catch (_) { wav = blob; }
     const data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1]); fr.onerror = rej; fr.readAsDataURL(wav); });
     const mime = (wav.type || "audio/wav").split(";")[0];
-    const r = await gfetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, key, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ role: "user", parts: [
-        { text: "Transcribe this voice note word for word. The speaker is Arc. Ajibola Oladiran (Prof Newrock), a Nigerian architect, talking about his projects, such as BuildNET, PPCE Academy, Ophtha Check, BuildCAD, Nexus, WWTBAA, Spider, Gong, Line & Space, Stories That Build, The Club and Wazobia. Spell those names as written here. Use plain punctuation and short hyphens, never em dashes. Return only the transcript, with no notes or headings." },
-        { inline_data: { mime_type: mime, data } }
-      ] }], generationConfig: { temperature: 0 } })
-    });
-    if (r.status === 429) throw { code: "rate_limited" };
-    if (!r.ok) throw { code: "upstream_error", message: await r.text() };
-    const j = await r.json();
-    const text = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("").replace(/[—–]/g, "-").trim();
+    const raw = await gemini([{ text: "Transcribe this voice note word for word. The speaker is Arc. Ajibola Oladiran (Prof Newrock), a Nigerian architect, talking about his projects, such as BuildNET, PPCE Academy, Ophtha Check, BuildCAD, ArchiNET, WWTBAA, Spider, Gong, Line & Space, Stories That Build, The Club and Wazobia. Spell those names as written here. Use plain punctuation and short hyphens, never em dashes. Return only the transcript, with no notes or headings." }, { inline_data: { mime_type: mime, data } }], {}, false);
+    const text = raw.replace(/[\u2014\u2013]/g, "-").trim();
     if (!text) throw { code: "empty" };
     return text;
   };
