@@ -311,6 +311,38 @@ button.link:hover{color:var(--indigo)}
 .rules li{margin-bottom:6px;max-width:70ch}
 @media (max-width:560px){.brand h1{font-size:19px}.tabs{width:100%}.tabs button{flex:1;padding:7px 2px;font-size:13px}.fs{grid-template-columns:1fr}.stat b{font-size:22px}}
 @media (prefers-reduced-motion:no-preference){.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}}}
+.k-milestone_done,.k-w_published{background:var(--good-soft);color:var(--good)}
+.k-win{background:var(--laterite-soft);color:var(--laterite)}
+.winlist{display:flex;flex-direction:column;gap:4px}
+.winrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:baseline;width:100%;text-align:left;border:0;border-left:3px solid var(--good);background:var(--bg);border-radius:0 6px 6px 0;padding:8px 10px;font-size:14px;color:inherit}
+.winrow.big{border-left-color:var(--laterite);background:var(--laterite-soft)}
+.winrow:hover b{color:var(--indigo)}
+.wdot{color:var(--good);font-size:12px}.winrow.big .wdot{color:var(--laterite);font-size:15px}
+.bars{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;align-items:end;height:150px}
+.barcol{display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end}
+.wbar{width:100%;max-width:28px;height:110px;flex:none;display:flex;flex-direction:column-reverse;background:var(--sunk);border-radius:4px;overflow:hidden}
+.wbar .bs{background:var(--good);display:block}.wbar .bb{background:var(--laterite);display:block}
+.barcol b{font:600 12px var(--f-mono);min-height:15px}.barcol small{font:500 10px var(--f-mono);color:var(--muted)}
+.plist{display:flex;flex-direction:column;gap:2px}
+.prow{display:grid;grid-template-columns:minmax(0,1.4fr) 1fr auto;grid-template-areas:"n b c" "n l l";gap:4px 10px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:9px 2px;color:inherit}
+.prow:hover{background:var(--bg)}
+.pn{grid-area:n;min-width:0}.pn b{display:block;font-size:14px}.pn small{color:var(--muted);font-size:12px}
+.pbar{grid-area:b;height:8px;background:var(--sunk);border-radius:4px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--good)}
+.pc{grid-area:c;font:600 12px var(--f-mono)}
+.ladder{grid-area:l;display:flex;gap:3px}.ladder i{flex:1;height:4px;border-radius:2px;background:var(--sunk)}.ladder i.on{background:var(--indigo)}
+.story p{margin:0 0 10px;font-size:15px;line-height:1.6}
+.cheer{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:min(440px,calc(100% - 32px));background:var(--good);color:#fff;padding:12px 16px;border-radius:10px;font-size:14px;z-index:70;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.cheer small{display:block;opacity:.85;font-size:12px;margin-top:3px}
+.celeRoot{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.45)}
+.celeRoot[hidden]{display:none}
+.cele{background:var(--surface);color:var(--fg);border-radius:14px;padding:26px 22px;max-width:420px;width:100%;text-align:center;border-top:6px solid var(--laterite)}
+.cele .star{font-size:40px;color:var(--laterite);line-height:1}
+.cele small{display:block;font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+.cele h2{margin:6px 0 8px;font-size:24px}.cele p{margin:0 0 6px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:8px;height:12px;border-radius:2px;animation:fall 2.4s ease-in forwards}
+@keyframes fall{to{top:105%;transform:rotate(540deg) translateX(40px);opacity:.7}}
+@media (max-width:560px){.tabs button{font-size:12px}.prow{grid-template-columns:1fr auto;grid-template-areas:"n c" "b b" "l l"}.bars{gap:3px}}
 </style>
 
 <style>
@@ -338,6 +370,7 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
       <button role="tab" data-tab="register" aria-selected="false">Register</button>
       <button role="tab" data-tab="roadmap" aria-selected="false">Roadmap</button>
       <button role="tab" data-tab="writing" aria-selected="false">Writing</button>
+      <button role="tab" data-tab="wins" aria-selected="false">Wins</button>
       <button role="tab" data-tab="review" aria-selected="false">Review</button>
       <button role="tab" data-tab="rules" aria-selected="false">Map</button>
     </nav>
@@ -369,6 +402,7 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
 
   <section id="tab-roadmap" hidden></section>
   <section id="tab-writing" hidden></section>
+  <section id="tab-wins" hidden></section>
   <section id="tab-review" hidden></section>
   <section id="tab-rules" hidden></section>
 </main>
@@ -393,6 +427,8 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
 <div id="wRoot" hidden><div class="scrim" id="wScrim"></div><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="wTitle"><div class="dhead"><span class="pid" id="wId"></span><h2 id="wTitle"></h2><button class="btn" id="wClose">Close</button></div><div class="dbody" id="wBody"></div><div class="dfoot"><button class="btn" id="wDelete">Delete</button><span class="grow"></span><button class="btn" id="wCancel">Cancel</button><button class="btn primary" id="wSave">Save</button></div></aside></div>
 <div id="lRoot" hidden><div class="scrim" id="lScrim"></div><aside class="drawer narrow" role="dialog" aria-modal="true" aria-labelledby="lTitle"><div class="dhead"><h2 id="lTitle">Log a post</h2><button class="btn" id="lClose">Close</button></div><div class="dbody" id="lBody"></div><div class="dfoot"><span class="grow"></span><button class="btn primary" id="lSave">Save post</button></div></aside></div>
 <div class="toast" id="toast" hidden></div>
+<div class="cheer" id="cheer" role="status" hidden></div>
+<div class="celeRoot" id="celeRoot" hidden><div class="cele" role="dialog" aria-modal="true" aria-labelledby="celeTitle"><div class="star" aria-hidden="true">★</div><small id="celeKind"></small><h2 id="celeTitle"></h2><p id="celeLine"></p><p class="sub" id="celeSub"></p><div class="quick" style="justify-content:center;margin-top:14px"><button class="btn primary" id="celeOk">Keep going</button><button class="btn" id="celeWins">See all wins</button></div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -528,7 +564,7 @@ function renderGrid(){
     <div class="tags">${cardTags(p)}<span class="score" title="Decision score">${score(p).total}</span></div>
   </button>`).join("");
 }
-function render(){renderStats();renderRail();renderGrid();if(tab==="focus"&&!(document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.wo))renderFocus();if(tab==="roadmap")renderRoadmap();if(tab==="writing"&&!wActiveInput())renderWriting();if(tab==="review"&&document.activeElement?.id!=="rvNotes")renderReview();}
+function render(){renderStats();renderRail();renderGrid();if(tab==="focus"&&!(document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.wo))renderFocus();if(tab==="roadmap")renderRoadmap();if(tab==="writing"&&!wActiveInput())renderWriting();if(tab==="review"&&document.activeElement?.id!=="rvNotes")renderReview();if(tab==="wins"&&!winForm&&!winsCtl)renderWins();}
 
 /* drawer */
 function field(id,label,val,type="text",opts,cls=""){
@@ -680,7 +716,7 @@ function diffEvents(old,p){
   if((old.weekOutcome||"")!==(p.weekOutcome||"")&&p.weekOutcome&&p.week&&!!old.week===!!p.week)add("outcome_set",{text:clip(p.weekOutcome)});
   const om=Array.isArray(old.milestones)?old.milestones:[],pm=Array.isArray(p.milestones)?p.milestones:[];
   pm.forEach(m=>{const o=om.find(x=>x.t===m.t);
-    if(m.done&&!(o&&o.done))add("milestone_done",{text:clip(m.t)});
+    if(m.done&&!(o&&o.done))add("milestone_done",{text:clip(m.t),...(pm.length>=2&&pm.every(x=>x.done)?{last:true}:{})});
     else if(!o)add("milestone_added",{text:clip(m.t),to:m.due||""});
     else if((o.due||"")!==(m.due||"")&&!m.done)add("milestone_moved",{text:clip(m.t),from:o.due||"",to:m.due||""});
   });
@@ -706,6 +742,7 @@ async function commit(old,p,extra=[]){
 }
 let activity={}, logQueue=Promise.resolve(), actUnsub=null, storedReview={}, genTimer=null;
 function logEvents(evts,wk=weekId(new Date())){
+  try{celebrateFrom(evts)}catch(_){}
   logQueue=logQueue.then(async()=>{
     const ref=db.doc("activity/"+wk);const s=await ref.get();
     const cur=s.exists?(s.data().events||[]):[];
@@ -713,6 +750,7 @@ function logEvents(evts,wk=weekId(new Date())){
     await ref.set({week:wk,events:next});
     activity[wk]=next;scheduleGen();
     if(tab==="review"&&reviewWeek===wk)renderReview();
+    if(tab==="wins")renderWins();
   }).catch(()=>toast("Change saved, but the activity log could not be updated."));
 }
 
@@ -870,10 +908,12 @@ function renderFocus(){
       <button class="${S.soon.length?"warn":""}" data-go="soon"><b>${S.soon.length}</b><span>Due in 14 days</span></button>
       <button class="${attU.length?"warn":"good"}" data-jump="att"><b>${attU.length}</b><span>Need attention</span></button>
       ${wmeta&&channels().length?(()=>{const tt=weekPostTotals(mondayOf(todayISO()));return `<button class="${tt.done>=tt.expected&&tt.expected?"good":writingNudges().some(n=>n.tone==="bad")?"bad":""}" data-tabgo="writing"><b>${tt.done}/${tt.expected}</b><span>Posts this week</span></button>`})():""}
+      ${(()=>{const n=winsSummary().week.length;return `<button class="${n?"good":""}" data-tabgo="wins"><b>${n}</b><span>Wins this week</span></button>`})()}
       <button class="${S.wkDone===S.wkN&&S.wkN?"good":""}" data-jump="five"><b>${S.wkDone}/${S.wkN||5}</b><span>Week's outcomes done</span></button>
     </div></div>
   ${S.overdue.length?`<div class="panel"><h2>Overdue</h2><p class="sub">Finish these first, or change the date so the timeline stays honest.</p><div class="nlist">${S.overdue.slice(0,8).map(x=>nitem(x.p,x.m.t,`${x.p.name} · ${x.p.priority} · ${dueText(x.m.due)}`,"bad",doneBtn(x))).join("")}</div>${S.overdue.length>8?`<p class="sub" style="margin-top:8px">${S.overdue.length-8} more in the Roadmap.</p>`:""}</div>`:""}
   <div class="panel"><h2>Due in the next two weeks</h2>${S.soon.length?`<div class="nlist">${S.soon.map(x=>nitem(x.p,x.m.t,`${x.p.name} · ${x.p.priority} · ${dueText(x.m.due)}`,x.d<=3?"warn":"info",doneBtn(x))).join("")}</div>`:`<p class="sub">Nothing due in the next 14 days.</p>`}</div>
+  ${winsFocusHTML(winsSummary())}
   ${focusWritingHTML()}
   <div id="five">${weekHTML()}</div>
   ${helpPanel()}
@@ -885,7 +925,7 @@ function renderFocus(){
 async function markMsDone(key){
   const [id,idx]=key.split("|");const old=projects[id];if(!old)return;
   const m=ms(old).map((x,i)=>i===+idx?{...x,done:true}:x);
-  if(await commit(old,{...old,milestones:m})){render();toast("Milestone done. Logged for the review.")}
+  if(await commit(old,{...old,milestones:m}))render();
 }
 /* roadmap */
 let rmPri="all",rmDone=false;
@@ -919,7 +959,7 @@ let woTimer={};
 function onWeekOutcome(id,val){clearTimeout(woTimer[id]);woTimer[id]=setTimeout(async()=>{if(!db||projects[id].weekOutcome===val)return;await commit(projects[id],{...projects[id],weekOutcome:val})},900)}
 
 /* review tab */
-const KIND_LABEL={created:"Added",archived:"Archived",restored:"Restored",maturity_up:"Maturity up",maturity_down:"Maturity down",revenue:"Revenue",money:"Money score",priority:"Priority",decision:"Decision",milestone:"Milestone",next_changed:"Next action",deadline:"Deadline",week_in:"Into the five",week_out:"Out of the five",outcome_done:"Outcome done",outcome_reopened:"Outcome reopened",outcome_set:"Outcome set",details:"Details",logged:"Work logged",update:"Update",w_idea:"New idea",w_published:"Posted",w_status:"Writing",milestone_done:"Milestone done",milestone_added:"Milestone added",milestone_moved:"Milestone moved"};
+const KIND_LABEL={created:"Added",archived:"Archived",restored:"Restored",maturity_up:"Maturity up",maturity_down:"Maturity down",revenue:"Revenue",money:"Money score",priority:"Priority",decision:"Decision",milestone:"Milestone",next_changed:"Next action",deadline:"Deadline",week_in:"Into the five",week_out:"Out of the five",outcome_done:"Outcome done",outcome_reopened:"Outcome reopened",outcome_set:"Outcome set",details:"Details",logged:"Work logged",update:"Update",w_idea:"New idea",w_published:"Posted",w_status:"Writing",milestone_done:"Milestone done",milestone_added:"Milestone added",milestone_moved:"Milestone moved",win:"Win"};
 function eventText(e){
   switch(e.kind){
     case "maturity_up":case "maturity_down":return `${e.from} → ${e.to}`;
@@ -935,6 +975,7 @@ function eventText(e){
     case "w_published":return "on "+(e.text||"");
     case "w_idea":case "w_status":return e.text||"";
     case "milestone_done":return e.text||"";
+    case "win":return (e.size==="big"?"Big win: ":"")+(e.text||"");
     case "milestone_added":return `${e.text}${e.to?" · "+e.to:""}`;
     case "milestone_moved":return `${e.text} · ${e.from||"no date"} → ${e.to||"no date"}`;
     default:return "";
@@ -953,12 +994,12 @@ function renderReview(){
   el.innerHTML=`<div class="panel"><div class="weekpick"><button class="btn" id="wkPrev" aria-label="Previous week">‹</button><b style="font-family:var(--f-mono)">${esc(reviewWeek)}</b><button class="btn" id="wkNext" aria-label="Next week"${isCur?" disabled":""}>›</button>${isCur?"":`<button class="btn" id="wkNow">This week</button>`}</div>
     <h2>Weekly review</h2>
     <p class="sub">${isCur?"Written automatically from what you do in the app, and updated with every change.":"The review as it stood at the end of that week."} ${g?`<b>${g.events}</b> recorded change${g.events===1?"":"s"} across <b>${g.projects}</b> project${g.projects===1?"":"s"}.`:""}${stale?" Rebuilt from that week's log against today's register.":""}</p>
-    ${writingReviewHTML(reviewWeek)}${g?`<div class="qa">${g.answers.map((items,i)=>`<section class="qblock"><h3>${i+1}. ${esc(Qs[i])}</h3><ul>${items.map(x=>`<li class="${esc(x.tone)}">${x.id?`<button class="link" data-open="${esc(x.id)}">${esc(x.text)}</button>`:esc(x.text)}</li>`).join("")}</ul></section>`).join("")}</div>`:`<div class="empty"><h2>No record for this week</h2>The log started on 5 October 2026. Weeks before that have no activity to review.</div>`}
+    ${winsReviewHTML(reviewWeek)}${writingReviewHTML(reviewWeek)}${g?`<div class="qa">${g.answers.map((items,i)=>`<section class="qblock"><h3>${i+1}. ${esc(Qs[i])}</h3><ul>${items.map(x=>`<li class="${esc(x.tone)}">${x.id?`<button class="link" data-open="${esc(x.id)}">${esc(x.text)}</button>`:esc(x.text)}</li>`).join("")}</ul></section>`).join("")}</div>`:`<div class="empty"><h2>No record for this week</h2>The log started on 5 October 2026. Weeks before that have no activity to review.</div>`}
   </div>
   <div class="panel"><h2>Your notes</h2><p class="sub">Optional. Anything the app could not see, such as a client call or an offline payment.</p>
     <div class="f"><label for="rvNotes">Notes for ${esc(reviewWeek)}</label><textarea id="rvNotes" rows="3">${esc(notes)}</textarea></div></div>
   <div class="panel"><h2>Activity log</h2><p class="sub">Every change recorded this week, newest first.</p>
-    ${ev.length?Object.entries(days).map(([d,es])=>`<div class="day"><h4>${esc(d)}</h4>${es.map(e=>`<button class="logrow" data-open="${esc(e.id)}"><span class="lt">${new Date(e.t).toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"})}</span><span class="lk k-${esc(e.kind)}">${esc(KIND_LABEL[e.kind]||e.kind)}</span><span class="ln"><b>${esc(e.name)}</b> ${esc(eventText(e))}</span></button>`).join("")}</div>`).join(""):`<div class="empty">Nothing recorded yet. Save a project, log work, or tick an outcome and it shows here.</div>`}
+    ${ev.length?Object.entries(days).map(([d,es])=>`<div class="day"><h4>${esc(d)}</h4>${es.map(e=>`<button class="logrow"${e.id?` data-open="${esc(e.id)}"`:""}><span class="lt">${new Date(e.t).toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"})}</span><span class="lk k-${esc(e.kind)}">${esc(KIND_LABEL[e.kind]||e.kind)}</span><span class="ln"><b>${esc(e.name)}</b> ${esc(eventText(e))}</span></button>`).join("")}</div>`).join(""):`<div class="empty">Nothing recorded yet. Save a project, log work, or tick an outcome and it shows here.</div>`}
   </div>`;
 }
 async function loadWeek(wk){
@@ -981,7 +1022,7 @@ function shiftWeek(n){const [y,w]=reviewWeek.split("-W").map(Number);const d=new
 /* project updates: dictate or paste, Claude proposes field changes, you confirm */
 let sample=null, assets=null, imgLimits=null;
 let upd={focus:"",text:"",files:[],stage:"compose",proposal:null,ctl:null,error:""};
-const UF={maturity:["Maturity","select",()=>MATS],name:["Project name","text"],state:["Current state","text"],character:["Current character","text"],revenue:["Current revenue","select",()=>REVENUE],money:["Money score","select",()=>[1,2,3,4,5,6]],priority:["Priority","select",()=>PRIORITIES],decision:["Decision","select",()=>DECISIONS],milestone:["Milestone","text"],next:["Next action","textarea"],exists:["What exists","textarea"],remains:["What remains","textarea"],deadline:["Deadline","date"],deadlineNote:["Deadline note","text"],weekDone:["This week's outcome done","select",()=>["true","false"]],milestones_done:["Milestones finished","textarea"],milestone_add:["New milestone (title | date)","text"],notes_append:["Add to notes","textarea"]};
+const UF={maturity:["Maturity","select",()=>MATS],name:["Project name","text"],state:["Current state","text"],character:["Current character","text"],revenue:["Current revenue","select",()=>REVENUE],money:["Money score","select",()=>[1,2,3,4,5,6]],priority:["Priority","select",()=>PRIORITIES],decision:["Decision","select",()=>DECISIONS],milestone:["Milestone","text"],next:["Next action","textarea"],exists:["What exists","textarea"],remains:["What remains","textarea"],deadline:["Deadline","date"],deadlineNote:["Deadline note","text"],weekDone:["This week's outcome done","select",()=>["true","false"]],milestones_done:["Milestones finished","textarea"],milestone_add:["New milestone (title | date)","text"],notes_append:["Add to notes","textarea"],win:["Win to celebrate","text"],win_size:["Win size","select",()=>["small","big"]]};
 function openUpdate(focus){
   if(!db)return toast("Sign in to add updates.");
   upd={focus:focus||"",text:"",files:[],stage:"compose",proposal:null,ctl:null,error:""};
@@ -1019,7 +1060,7 @@ function renderUpdate(){
           if(d[1]==="select")ctl=`<select id="${id}_v">${d[2]().map(o=>`<option${String(o)===String(v)?" selected":""}>${esc(o)}</option>`).join("")}</select>`;
           else if(d[1]==="textarea")ctl=`<textarea id="${id}_v" rows="${k==="next"?2:3}">${esc(v)}</textarea>`;
           else ctl=`<input id="${id}_v" type="${d[1]}" value="${esc(v)}">`;
-          const was=["notes_append","milestones_done","milestone_add"].includes(k)?"":k==="weekDone"?String(!!old.weekDone):String(old[k]??"");
+          const was=["notes_append","milestones_done","milestone_add","win","win_size"].includes(k)?"":k==="weekDone"?String(!!old.weekDone):String(old[k]??"");
           return `<div class="chg" data-row="${id}"><input type="checkbox" id="${id}_c" checked aria-label="Apply ${esc(d[0])}"><div class="cv"><span class="cl">${esc(d[0])}</span>${was&&k!=="exists"&&k!=="remains"?`<span class="was">${esc(clip(was,120))}</span>`:""}${ctl}${u.why&&u.why[k]?`<span class="why">${esc(u.why[k])}</span>`:""}</div></div>`}).join(""):`<p style="margin:0;font-size:14px;color:var(--muted)">No field changes. The update is logged to the project's history.</p>`}
       </div>`}).join("")}
       ${(P.newProjects||[]).map((n,i)=>`<div class="prop"><b>Not in the register yet: ${esc(n.name)}</b><span style="font-size:14px">${esc(n.purpose||"")}</span><div><button class="btn" data-newproj="${i}">Add as a new project</button></div></div>`).join("")}
@@ -1050,6 +1091,8 @@ Rules:
 - weekDone: true only when he says this week's outcome for a project in this week's five is finished.
 - milestones_done: exact titles of that project's milestones he says are now finished, one per line.
 - milestone_add: a new milestone he commits to, written as "title | YYYY-MM-DD" (date only if he gives or clearly implies one).
+- win: when he describes an achievement worth celebrating that no other field already captures (a client signed, a payment received, a launch, a talk delivered, something finally working), one short line naming it. Leave it out for routine work.
+- win_size: "big" for launches, first or major money, signed clients, acceptances and awards, otherwise "small". Only with win.
 - notes_append: facts worth keeping that fit no other field (figures, names, decisions, links).
 - name: change it only when he clearly says the project now has a new name. Keep every other name exactly as it is, and respect locked decisions written in notes (for example the OPHTHA CHECK name).
 - summary: one or two sentences in plain English, first person, as he would say it ("Finished the..."). Use hyphens, never em dashes.
@@ -1082,7 +1125,7 @@ function cleanProposal(r,focus){
       v=typeof v==="string"?v.replace(/\u2014/g,"-"):v;
       if(okVal[k]&&!okVal[k](v))return;
       if(k==="maturity"&&!MATS.includes(v))MATS.push(v);
-      if(!["notes_append","weekDone","milestones_done","milestone_add"].includes(k)&&String(projects[id][k]??"")===String(v))return;
+      if(!["notes_append","weekDone","milestones_done","milestone_add","win","win_size"].includes(k)&&String(projects[id][k]??"")===String(v))return;
       if(k==="weekDone"&&!projects[id].week)return;
       ch[k]=k==="weekDone"?"true":v;if(u.why&&u.why[k])why[k]=String(u.why[k]);
     });
@@ -1126,11 +1169,13 @@ async function applyUpdates(){
   const shots=await uploadShots();let n=0;
   for(let i=0;i<upd.proposal.updates.length;i++){
     const u=upd.proposal.updates[i];const pid=$(`#u${i}_pid`).value;const old=projects[pid];if(!old)continue;
-    const p={...old};
+    const p={...old};const extra=[];
     Object.keys(u.changes).forEach(k=>{
       const id=`u${i}_${k}`;if(!$(`#${id}_c`).checked)return;let v=$(`#${id}_v`).value;
       if(k==="milestones_done"){const titles=v.split("\n").map(x=>x.trim().toLowerCase()).filter(Boolean);p.milestones=ms(old).map(m=>titles.some(t=>m.t.toLowerCase()===t||m.t.toLowerCase().includes(t)||t.includes(m.t.toLowerCase()))?{...m,done:true}:m);return}
       if(k==="milestone_add"){const [t,d]=v.split("|").map(x=>x.trim());if(t)p.milestones=[...(p.milestones||ms(old)),{t,due:/^\d{4}-\d{2}-\d{2}$/.test(d||"")?d:"",done:false}];return}
+      if(k==="win_size")return;
+      if(k==="win"){if(v.trim()){const sz=$(`#u${i}_win_size_v`);extra.push({kind:"win",text:clip(v.trim(),200),size:sz&&$(`#u${i}_win_size_c`)?.checked!==false?sz.value:(u.changes.win_size==="big"?"big":"small")})}return}
       if(k==="notes_append"){if(v.trim())p.notes=(old.notes?old.notes.trim()+"\n":"")+todayISO()+": "+v.trim();return}
       if(k==="weekDone"){if(v==="true"&&p.week)p.weekDone=true;return}
       if(k==="money")v=+v;
@@ -1139,7 +1184,7 @@ async function applyUpdates(){
     const summary=$(`#u${i}_sum`).value.trim()||u.summary;
     p.log=[{d:todayISO(),t:new Date().toISOString(),summary:clip(summary,400),source:"voice",shots,raw:clip(upd.text,800)},...(old.log||[])].slice(0,40);
     if(p.lastActivity!==todayISO())p.lastActivity=todayISO();
-    if(await commit(old,p,[{kind:"update",text:clip(summary,200)}]))n++;
+    if(await commit(old,p,[{kind:"update",text:clip(summary,200)},...extra]))n++;
   }
   closeUpdate();render();toast(n?`Saved ${n} update${n>1?"s":""}. The weekly review is updated.`:"Nothing was saved.");
 }
@@ -1579,6 +1624,13 @@ document.addEventListener("click",e=>{
   if(t.dataset.view){view=t.dataset.view;renderRail();renderGrid();return}
   if(t.dataset.go){view=t.dataset.go;setTab("register");render();return}
   if(t.dataset.tabgo){setTab(t.dataset.tabgo);return}
+  if(t.dataset.winlog){winForm=true;setTab("wins");setTimeout(()=>{$("#winFormP")?.scrollIntoView({block:"start"});$("#wn_text")?.focus()},60);return}
+  if(t.id==="wn_save"){saveWin();return}
+  if(t.id==="wn_cancel"){winForm=false;renderWins();return}
+  if(t.id==="winStory"){writeStory();return}
+  if(t.dataset.winsall){winsAllProj=!winsAllProj;renderWins();return}
+  if(t.id==="celeOk"){$("#celeRoot").hidden=true;return}
+  if(t.id==="celeWins"){$("#celeRoot").hidden=true;winForm=false;setTab("wins");return}
   if(t.dataset.tab){setTab(t.dataset.tab);return}
   if(t.dataset.mic){toggleMic(t);return}
   if(t.dataset.help){scheduleHelp(t.dataset.help);return}
@@ -1652,12 +1704,163 @@ $("#addBtn").onclick=()=>{const ids=Object.keys(projects).map(k=>parseInt(k.slic
 $("#exportBtn").onclick=exportCsv;
 $("#dClose").onclick=closeDrawer;$("#dCancel").onclick=closeDrawer;$("#scrim").onclick=closeDrawer;
 $("#dSave").onclick=save;$("#dDelete").onclick=archive;
-document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#lRoot").hidden){closeLog();return}if(!$("#wRoot").hidden){closePiece();return}if(!$("#updRoot").hidden)closeUpdate();else if(!$("#drawerRoot").hidden)closeDrawer()});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#celeRoot").hidden){$("#celeRoot").hidden=true;return}if(!$("#lRoot").hidden){closeLog();return}if(!$("#wRoot").hidden){closePiece();return}if(!$("#updRoot").hidden)closeUpdate();else if(!$("#drawerRoot").hidden)closeDrawer()});
 $("#updScrim").onclick=closeUpdate;$("#wScrim").onclick=closePiece;$("#lScrim").onclick=closeLog;
 document.addEventListener("paste",e=>{if($("#updRoot").hidden||upd.stage!=="compose")return;const imgs=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith("image/"));if(imgs.length){e.preventDefault();addFiles(imgs)}});
-function setTab(k){tab=k;document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===k));["focus","register","roadmap","writing","review","rules"].forEach(x=>$("#tab-"+x).hidden=x!==k);
-  if(k==="focus")renderFocus();if(k==="writing")renderWriting();if(k==="roadmap")renderRoadmap();if(k==="review")subscribeReview();if(k==="rules")renderRules();window.scrollTo(0,0)}
-const h=(location.hash||"").slice(1);if(["register","roadmap","writing","review","rules"].includes(h))setTab(h);
+function setTab(k){tab=k;document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===k));["focus","register","roadmap","writing","wins","review","rules"].forEach(x=>$("#tab-"+x).hidden=x!==k);
+  if(k==="focus")renderFocus();if(k==="writing")renderWriting();if(k==="roadmap")renderRoadmap();if(k==="review")subscribeReview();if(k==="wins")renderWins();if(k==="rules")renderRules();window.scrollTo(0,0)}
+const h=(location.hash||"").slice(1);if(["register","roadmap","writing","wins","review","rules"].includes(h))setTab(h);
+
+/* wins: progress and celebration, built from the activity log */
+let winsMeta=null, winsCtl=null, winForm=false, allActLoaded=false; let winsAllProj=false;
+const WIN_KINDS=["milestone_done","maturity_up","revenue","outcome_done","w_published","win"];
+function matLabel(m){const hi=matRange(m)[1];return `${m} ${MAT_NAMES[hi]||""}`.trim()}
+function winOf(e){
+  switch(e.kind){
+    case "milestone_done":return e.last?{size:"big",title:"Every milestone done",line:`${e.name}: all milestones finished, the last was "${e.text}"`}:{size:"small",title:"Milestone done",line:`${e.name}: ${e.text}`};
+    case "maturity_up":return {size:"big",title:"Moved up a stage",line:`${e.name} moved up to ${matLabel(e.to)}`};
+    case "revenue":{const r=["none","experimental","active","recurring"],a=r.indexOf(e.from),b=r.indexOf(e.to);if(b<=a)return null;return b>=2?{size:"big",title:"Money coming in",line:`${e.name} is now earning (${e.to})`}:{size:"small",title:"First money test",line:`${e.name} started testing revenue`}}
+    case "outcome_done":return {size:"small",title:"Weekly outcome done",line:`${e.name}${e.text?": "+e.text:""}`};
+    case "w_published":return {size:"small",title:"Posted",line:`${e.name} ${e.text?"on "+e.text:""}`.trim()};
+    case "win":return {size:e.size==="big"?"big":"small",title:e.size==="big"?"Big win":"Win",line:e.name?`${e.name}: ${e.text}`:e.text};
+  }
+  return null;
+}
+function allWins(){
+  const out=[],seen=new Set();
+  Object.keys(activity).forEach(wk=>(activity[wk]||[]).forEach(e=>{
+    if(!WIN_KINDS.includes(e.kind))return;const w=winOf(e);if(!w)return;
+    const k=[e.id,e.kind,e.text,e.to,String(e.t).slice(0,10)].join("|");if(seen.has(k))return;seen.add(k);
+    out.push({...w,e,wk,t:e.t,d:String(e.t).slice(0,10)});
+  }));
+  return out.sort((a,b)=>String(b.t).localeCompare(String(a.t)));
+}
+function winsIn(W,wk){return W.filter(w=>w.wk===wk)}
+function winStreak(W){let n=0,d=new Date();const has=new Set(W.map(w=>w.wk));if(!has.has(weekId(d)))d.setDate(d.getDate()-7);for(let i=0;i<104;i++){if(has.has(weekId(d))){n++;d.setDate(d.getDate()-7)}else break}return n}
+function winsSummary(){
+  const W=allWins(),wk=weekId(new Date()),mon=todayISO().slice(0,7);
+  return {W,week:winsIn(W,wk),month:W.filter(w=>w.d.slice(0,7)===mon),big:W.filter(w=>w.size==="big"),streak:winStreak(W)};
+}
+/* celebrate the moment it happens */
+const CHEER_S=["Ticked off.","One more down.","Progress you can point to.","That counts.","Keep that pace."];
+const CHEER_B=["Big win.","That's a real step up.","Mark this one.","This is what the plan was for."];
+function celebrateFrom(evts){
+  const wins=evts.map(e=>winOf(e)).filter(Boolean);if(!wins.length)return;
+  const big=wins.find(w=>w.size==="big");
+  const wkN=winsIn(allWins(),weekId(new Date())).length+wins.length;
+  if(big)celebrate(big,wkN,wins.length);else celebrateSmall(wins[0],wkN,wins.length);
+}
+function confetti(n){
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const box=document.createElement("div");box.className="confetti";box.setAttribute("aria-hidden","true");
+  const C=["var(--good)","var(--laterite)","var(--indigo)","var(--warn)"];
+  for(let i=0;i<n;i++){const s=document.createElement("i");s.style.left=(Math.random()*100)+"%";s.style.background=C[i%C.length];s.style.animationDelay=(Math.random()*.5)+"s";s.style.animationDuration=(1.6+Math.random()*1.4)+"s";s.style.transform=`rotate(${Math.random()*360}deg)`;box.appendChild(s)}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),3600);
+}
+function celebrateSmall(w,wkN,n){
+  const t=$("#cheer");t.innerHTML=`<b>${esc(CHEER_S[Math.floor(Math.random()*CHEER_S.length)])}</b> ${esc(w.line)}<small>${n>1?n+" wins just now · ":""}Win ${wkN} this week</small>`;
+  t.hidden=false;clearTimeout(celebrateSmall._t);celebrateSmall._t=setTimeout(()=>t.hidden=true,4200);confetti(18);
+}
+function celebrate(w,wkN,n){
+  $("#celeTitle").textContent=CHEER_B[Math.floor(Math.random()*CHEER_B.length)];
+  $("#celeKind").textContent=w.title;$("#celeLine").textContent=w.line;
+  $("#celeSub").textContent=`${n>1?n+" wins in this update. ":""}Win ${wkN} this week.`;
+  $("#celeRoot").hidden=false;confetti(70);setTimeout(()=>$("#celeOk")?.focus(),50);
+}
+/* load every week's log once, so the wins history is complete */
+async function loadAllActivity(){
+  if(!db||allActLoaded)return;allActLoaded=true;
+  try{const s=await db.collection("activity").limit(500).get();const cur=weekId(new Date());s.docs.forEach(d=>{if(d.exists&&(d.id!==cur||!activity[cur]))activity[d.id]=d.data().events||[]})}catch(_){}
+  try{const m=await db.doc("meta/wins").get();winsMeta=m.exists?m.data():{}}catch(_){winsMeta={}}
+  render();
+}
+function winRow(w){return `<button class="winrow ${w.size}"${w.e.id?` data-open="${esc(w.e.id)}"`:""}><span class="wdot" aria-hidden="true">${w.size==="big"?"★":"●"}</span><span><b>${esc(w.title)}</b> ${esc(w.line)}</span><span class="lt">${esc(fmtDate(w.d))}</span></button>`}
+function winsFocusHTML(S){
+  const recent=S.W.filter(w=>daysSince(w.d)<=7).slice(0,4);
+  if(recent.length)return `<div class="panel winpanel"><h2>Recent wins</h2><p class="sub">${S.week.length} this week${S.streak>1?` · ${S.streak}-week streak`:""}. Keep the run going.</p><div class="winlist">${recent.map(winRow).join("")}</div><div class="quick" style="margin-top:10px"><button class="btn" data-tabgo="wins">All wins</button></div></div>`;
+  const nm=list().filter(active).map(p=>({p,m:nextMs(p)})).filter(x=>x.m&&x.m.due).sort((a,b)=>a.m.due.localeCompare(b.m.due))[0];
+  return `<div class="panel winpanel"><h2>Wins</h2><p class="sub">No wins logged in the last seven days.${nm?` The closest one within reach: <b>${esc(nm.m.t)}</b> on ${esc(nm.p.name)}, ${esc(dueText(nm.m.due))}.`:""}</p><div class="quick" style="margin-top:10px"><button class="btn" data-winlog="1">Log a win</button><button class="btn" data-tabgo="wins">Open wins</button></div></div>`;
+}
+function winsReviewHTML(wk){
+  const W=winsIn(allWins(),wk);if(!W.length)return "";
+  const b=W.filter(w=>w.size==="big").length;
+  return `<section class="qblock"><h3>Wins this week · ${W.length}${b?` (${b} big)`:""}</h3><div class="winlist">${W.map(winRow).join("")}</div></section>`;
+}
+function renderWins(){
+  const el=$("#tab-wins");if(!el)return;
+  if(!loaded){el.innerHTML=`<div class="empty">Loading.</div>`;return}
+  if(!allActLoaded)loadAllActivity();
+  const S=winsSummary();
+  // weekly bars, last 12 weeks
+  const weeks=[];const d=new Date();for(let i=11;i>=0;i--){const x=new Date(d);x.setDate(x.getDate()-7*i);weeks.push(weekId(x))}
+  const counts=weeks.map(wk=>{const W=winsIn(S.W,wk);return {wk,s:W.filter(w=>w.size==="small").length,b:W.filter(w=>w.size==="big").length}});
+  const max=Math.max(3,...counts.map(c=>c.s+c.b));
+  // per-project progress
+  const Pall=list().filter(p=>active(p)&&ms(p).length),P=Pall.filter(p=>winsAllProj||["P1","P2"].includes(p.priority)).map(p=>{const M=ms(p),dn=M.filter(m=>m.done).length;return {p,dn,n:M.length,pct:Math.round(100*dn/M.length),hi:matRange(p.maturity)[1]}}).sort((a,b)=>({P1:0,P2:1,P3:2,P4:3}[a.p.priority]??4)-({P1:0,P2:1,P3:2,P4:3}[b.p.priority]??4)||b.pct-a.pct);
+  const totDone=Pall.reduce((s,p)=>s+ms(p).filter(m=>m.done).length,0),tot=Pall.reduce((s,p)=>s+ms(p).length,0);
+  const byMonth={};S.W.forEach(w=>{const k=new Date(w.d+"T12:00:00").toLocaleDateString(undefined,{month:"long",year:"numeric"});(byMonth[k]=byMonth[k]||[]).push(w)});
+  const story=winsMeta&&winsMeta.story;
+  el.innerHTML=`<div class="hero"><small>Wins and progress</small><h2>${S.W.length?`${S.W.length} win${S.W.length>1?"s":""} logged so far. ${S.week.length?`${S.week.length} this week.`:"None yet this week."}`:"Your first win is one tick away."}</h2>
+    <p>Milestones, stage moves, money, weekly outcomes and posts are counted as you go. Log anything the app can't see.</p>
+    <div class="pulse">
+      <button class="${S.week.length?"good":""}" data-jump="wTimeline"><b>${S.week.length}</b><span>This week</span></button>
+      <button data-jump="wTimeline"><b>${S.month.length}</b><span>This month</span></button>
+      <button class="${S.big.length?"good":""}" data-jump="wTrophy"><b>${S.big.length}</b><span>Big wins</span></button>
+      <button class="${S.streak>1?"good":""}" data-jump="wChart"><b>${S.streak}</b><span>Week streak</span></button>
+      <button data-jump="wProj"><b>${totDone}/${tot}</b><span>Milestones done</span></button>
+    </div>
+    <div class="quick" style="margin-top:14px"><button class="btn primary" data-winlog="1">Log a win</button><button class="btn" id="winStory">How far have I come?</button></div></div>
+  ${winForm?`<div class="panel" id="winFormP"><h2>Log a win</h2><p class="sub">For wins the app can't see: a client said yes, a talk went well, a payment landed, a hard conversation finally happened.</p>
+    <div class="f"><label for="wn_text">What happened</label><textarea id="wn_text" rows="2" placeholder="e.g. Signed the first studio client for 2027"></textarea></div>
+    <div class="fs"><div class="f"><label for="wn_proj">Project (optional)</label><select id="wn_proj"><option value="">None</option>${list().filter(p=>p.priority!=="PX").sort((a,b)=>a.id.localeCompare(b.id)).map(p=>`<option value="${esc(p.id)}">${esc(p.id)} · ${esc(p.name)}</option>`).join("")}</select></div>
+    <div class="f"><label for="wn_size">Size</label><select id="wn_size"><option value="small">Small win</option><option value="big">Big win</option></select></div></div>
+    <div class="quick"><button class="btn primary" id="wn_save">Save and celebrate</button><button class="btn" id="wn_cancel">Cancel</button></div></div>`:""}
+  ${story||winsCtl?`<div class="panel" id="wStory"><h2>How far you've come</h2>${winsCtl?`<p class="sub"><span class="dots"><i></i><i></i><i></i></span> Writing it up from your log.</p>`:`<div class="story">${story.split(/\n+/).map(x=>`<p>${esc(x)}</p>`).join("")}</div><p class="sub">Written ${esc(fmtDate(String(winsMeta.at||"").slice(0,10)))}. Tap the button above for a fresh one.</p>`}</div>`:""}
+  <div class="panel" id="wChart"><h2>Wins per week</h2><p class="sub">The last twelve weeks. Dark is big wins.</p>
+    <div class="bars">${counts.map(c=>`<div class="barcol" title="${esc(c.wk)}: ${c.s+c.b} wins"><div class="wbar"><i class="bb" style="height:${100*c.b/max}%"></i><i class="bs" style="height:${100*c.s/max}%"></i></div><b>${c.s+c.b||""}</b><small>${esc(c.wk.slice(-3))}</small></div>`).join("")}</div></div>
+  <div class="panel" id="wTrophy"><h2>Big wins</h2><p class="sub">Stage moves, money coming in, finished milestone sets, and the big ones you log.</p>${S.big.length?`<div class="winlist">${S.big.map(winRow).join("")}</div>`:`<p class="sub">None yet. The next stage move on any P1 lands here.</p>`}</div>
+  <div class="panel" id="wProj"><h2>Progress by project</h2><p class="sub">Milestones done against the plan, and where each project sits on the M0 to M7 ladder. ${winsAllProj?"All active projects.":"P1 and P2 projects."} <button class="btn" data-winsall="1" style="margin-left:6px">${winsAllProj?"Show P1 and P2 only":"Show all "+Pall.length}</button></p>
+    <div class="plist">${P.map(x=>`<button class="prow" data-open="${esc(x.p.id)}"><span class="pn"><b>${esc(x.p.name)}</b><small>${esc(x.p.id)} · ${esc(x.p.priority)} · ${esc(matLabel(x.p.maturity))}</small></span><span class="pbar" aria-label="${x.dn} of ${x.n} milestones done"><i style="width:${x.pct}%"></i></span><span class="pc">${x.dn}/${x.n}</span><span class="ladder" aria-hidden="true">${MAT_NAMES.map((_,i)=>`<i class="${i<=x.hi?"on":""}"></i>`).join("")}</span></button>`).join("")}</div></div>
+  <div class="panel" id="wTimeline"><h2>Every win</h2><p class="sub">Newest first. Tap one to open the project.</p>${S.W.length?Object.entries(byMonth).map(([m,ws])=>`<div class="day"><h4>${esc(m)} · ${ws.length}</h4><div class="winlist">${ws.map(winRow).join("")}</div></div>`).join(""):`<p class="sub">Nothing yet. Tick a milestone, finish a weekly outcome or log a post and it appears here.</p>`}</div>`;
+}
+async function saveWin(){
+  const text=($("#wn_text").value||"").trim();if(!text){$("#wn_text").focus();return}
+  const id=$("#wn_proj").value,size=$("#wn_size").value,p=projects[id];
+  const e={t:new Date().toISOString(),id:id||"",name:p?clip(p.name,80):"",kind:"win",text:clip(text,200),size};
+  if(p&&p.lastActivity!==todayISO()){const q={...p,lastActivity:todayISO(),log:[{d:todayISO(),t:e.t,summary:"Win: "+clip(text,380),source:"win"},...(p.log||[])].slice(0,40)};try{await db.doc("projects/"+p.id).set(q);projects[p.id]=q}catch(_){}}
+  winForm=false;logEvents([e]);renderWins();
+}
+function winsPrompt(S){
+  const W=S.W.slice(0,80).map(w=>`${w.d} [${w.size}] ${w.title}: ${w.line}`).join("\n");
+  const P=list().filter(p=>active(p)&&["P1","P2"].includes(p.priority)).map(p=>`${p.name} - ${p.maturity}, ${ms(p).filter(m=>m.done).length}/${ms(p).length} milestones done, revenue ${p.revenue||"none"}`).join("\n");
+  return `You are writing a short progress note for Prof Newrock (Arc), an architect and founder of BuildNET in Ibadan, Nigeria, who runs many projects at once. He wants to see how far he has come so the work never feels blank.
+
+Today is ${todayISO()}. The log began on 5 October 2026.
+
+Wins logged (newest first):
+${W||"(none yet)"}
+
+Where his main projects stand:
+${P}
+
+Write 3 short paragraphs, speaking to him as "you":
+1. What he has actually achieved, naming the specific wins and the biggest ones first.
+2. The pattern: which parts of the portfolio are moving and how they help each other.
+3. The single next win that is closest, and why it matters.
+Be warm and specific. Use only the facts above. No hype, no exclamation marks. Use hyphens, never em dashes. Do not use the phrase "not X but Y" or the words "room" or "dangerous". If there are few wins, say so kindly and point to the closest one.
+Reply with only JSON: {"story":"paragraph one\\n\\nparagraph two\\n\\nparagraph three"}`;
+}
+async function writeStory(){
+  if(!sample||!(window.ccHasKey&&window.ccHasKey())){toast("Add your Gemini key in Map → Voice update AI first.");return}
+  if(winsCtl)return;winsCtl=new AbortController();renderWins();document.getElementById("wStory")?.scrollIntoView({behavior:"smooth",block:"start"});
+  try{
+    if(!allActLoaded)await loadAllActivity();
+    const r=await sample.json(winsPrompt(winsSummary()),{signal:winsCtl.signal,cache:false});
+    const story=String(r&&r.story||"").replace(/[—–]/g,"-").trim();if(!story)throw {code:"empty"};
+    winsMeta={...(winsMeta||{}),story,at:new Date().toISOString()};try{await db.doc("meta/wins").set(winsMeta)}catch(_){}
+  }catch(e){const c=e&&e.code;if(c!=="cancelled")toast(c==="bad_key"?"The Gemini key was rejected. Check it in Map → Voice update AI.":c==="rate_limited"?"You've hit the AI usage limit for now. Try again later.":"Couldn't write it just now. Try again.")}
+  finally{winsCtl=null;renderWins()}
+}
 
 render();
 
@@ -1684,6 +1887,7 @@ render();
   db.doc("meta/settings").onSnapshot(s=>{if(s.exists)settings={forgottenDays:30,nextId:51,...s.data()};gotSettings=true;maybeRoll();render()},()=>{gotSettings=true});
   db.doc("activity/"+wk).onSnapshot(s=>{if(s.metadata.hasPendingWrites)return;activity[wk]=s.exists?(s.data().events||[]):[];render()},()=>{});
   db.doc("reviews/"+wk).get().then(r=>{storedReview[wk]=r.exists?{...r.data()}:{};scheduleGen()}).catch(()=>{});
+  loadAllActivity();
   db.collection("writing").onSnapshot(snap=>{const n={};snap.docs.forEach(d=>{if(d.exists)n[d.id]={...d.data(),id:d.id}});writing=n;render()},()=>{});
   db.doc("meta/writing").onSnapshot(s=>{wmeta=s.exists?{...s.data()}:null;render()},()=>{});
   db.collection("projects").onSnapshot(snap=>{
